@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+    <!-- Dans votre vue où vous affichez les détails d'un client -->
     <div class="card">
         <div class="card-header">Customers List</div>
         @if (session('store'))
@@ -37,7 +38,7 @@
                             <form action="{{ route('customers.destroy', $customer->id) }}" method="post">
                                 @csrf
                                 @method('DELETE')
-
+                                <a href="{{ route('order.history', ['customerId' => $customer->id]) }}">Historique des commandes</a>
                                 <a href="{{ route('customers.show', $customer->id) }}" class="btn btn-warning btn-sm"><i class="bi bi-eye"></i> Show</a>
 
                                 @can('edit-customer')
