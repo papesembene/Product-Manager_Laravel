@@ -23,10 +23,8 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:250',
-            'description' => 'required|string',
-            'price'=>'number',
-            'quantity'=>'number',
-            'image'=>'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'price'=>'required|numeric',
+            'quantity'=>'required|numeric',
             'category_id'=>'required'
         ];
     }

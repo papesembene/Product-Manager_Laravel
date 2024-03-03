@@ -18,23 +18,30 @@
                     <form action="{{ route('products.update', $product->id) }}" method="post">
                         @csrf
                         @method("PUT")
-
                         <div class="mb-3 row">
                             <label for="name" class="col-md-4 col-form-label text-md-end text-start">Name</label>
                             <div class="col-md-6">
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ $product->name }}">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ $product->name }}">
                                 @if ($errors->has('name'))
                                     <span class="text-danger">{{ $errors->first('name') }}</span>
                                 @endif
                             </div>
                         </div>
-
                         <div class="mb-3 row">
-                            <label for="description" class="col-md-4 col-form-label text-md-end text-start">Description</label>
+                            <label for="price" class="col-md-4 col-form-label text-md-end text-start">Price</label>
                             <div class="col-md-6">
-                                <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description">{{ $product->description }}</textarea>
-                                @if ($errors->has('description'))
-                                    <span class="text-danger">{{ $errors->first('description') }}</span>
+                                <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ $product->price }}">
+                                @if ($errors->has('price'))
+                                    <span class="text-danger">{{ $errors->first('price') }}</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="quantity" class="col-md-4 col-form-label text-md-end text-start">Quantity</label>
+                            <div class="col-md-6">
+                                <input type="number" class="form-control @error('quantity') is-invalid @enderror" name="quantity" value="{{ $product->quantity }}">
+                                @if ($errors->has('quantity'))
+                                    <span class="text-danger">{{ $errors->first('quantity') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -43,7 +50,7 @@
                             <div class="col-md-6">
                                 <select class="form-control" name="category_id" @selected($product->category_id)>
                                     @foreach(\App\Models\Category::all() as $category)
-                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                        <option value="{{$category->id}}" @selected($product->category_id==$category->id)>{{$category->name}}</option>
                                     @endforeach
                                 </select>
                                 @if ($errors->has('category_id'))
@@ -53,7 +60,7 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <input type="submit" class="col-md-3 offset-md-5 btn btn-primary" value="Update">
+                            <button type="submit" class="col-md-3 offset-md-5 btn btn-primary" value="">Update</button>
                         </div>
 
                     </form>

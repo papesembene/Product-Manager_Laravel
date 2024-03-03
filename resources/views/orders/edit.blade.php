@@ -7,8 +7,9 @@
     </div>
     <div class="row">
         <div class="col-xl-12">
-            <form action="{{route('orders.store')}}" method="post" enctype="multipart/form-data">
+            <form action="{{route('orders.edit',$order->id)}}" method="post" enctype="multipart/form-data">
                 @csrf
+                @method("PUT")
                 <div class="card mb-2">
                     <div class="card-body">
                         <div class="create-invoice-wrapper">
@@ -163,7 +164,7 @@
             </form>
         </div>
 
-        </div>
+    </div>
     </div>
     <!-- Row end -->
 
@@ -247,10 +248,10 @@
                       <div class="input-group m-0">
                          <input type="number" id="order_quantity" name="products[${productIndex}][order_quantity]" min=1 max={{$prod->quantity}}  class="form-control" placeholder="Order Quantity">
                                @if ($errors->has('order_quantity'))
-                        <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
+            <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
                               @endif
-                      </div>
-                    </td>
+            </div>
+          </td>
 <button type="button" class="remove-product">Supprimer</button>
 `;
 

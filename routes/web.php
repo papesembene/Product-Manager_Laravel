@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -29,6 +30,8 @@ Route::get('/orders/product/{id}', [OrderController::class, 'getProductDetails']
 Route::get('/orders/customer/{id}', [OrderController::class, 'getCustomerDetails']);
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
 Route::resources([
     'roles' => RoleController::class,
     'users' => UserController::class,
@@ -40,6 +43,6 @@ Route::resources([
 // routes/web.php
 
 
-Route::get('/orders/history/{customerId}', [OrderController::class, 'showOrderHistory'])->name('order.history');
+Route::get('/orders/{customerId}', [OrderController::class, 'customerOrderHistory'])->name('order.history');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

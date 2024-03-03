@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use function Laravel\Prompts\alert;
 
 
 class OrderController extends Controller
@@ -68,9 +69,9 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function update(UpdateOrderRequest $request, Order $order)
     {
-        //validation  data
+        // Validation des données de la requête
         $validatedData = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'order_date' => 'required|date',
@@ -78,22 +79,24 @@ class OrderController extends Controller
             'products.*.order_quantity' => 'required|integer|min:1',
         ]);
 
+        // Supprimer les détails de la commande existants
+        $order->Order_details()->delete();
+
         // Vérifier la disponibilité en stock pour chaque produit demandé
         foreach ($validatedData['products'] as $productData) {
             $product = Product::find($productData['product_id']);
-            if ($product->quantity < $productData['order_quantity']) {
-                return back()->withError('La quantité demandée n\'est pas disponible en stock pour le produit '.$product->name);
+            if ($product->quantity < $productData['order_quantity'] || $product->quantity == 0 ) {
+                return redirect()->back()->withError('La quantité demandée n\'est pas disponible en stock pour le produit '.$product->name);
             }
         }
 
-        // Créer la commande
-        $order = Order::create([
+        // Mettre à jour la commande
+        $order->update([
             'customer_id' => $validatedData['customer_id'],
-            'order_num' => "COM" . rand(100, 1000),
             'order_date' => $validatedData['order_date'],
         ]);
 
-        // Créer les détails de la commande pour chaque produit
+        // Recréer les détails de la commande pour chaque produit
         foreach ($validatedData['products'] as $productData) {
             $order->Order_details()->create([
                 'order_quantity' => $productData['order_quantity'],
@@ -103,12 +106,13 @@ class OrderController extends Controller
             // Mettre à jour la quantité en stock du produit
             $product = Product::find($productData['product_id']);
             $product->quantity -= $productData['order_quantity'];
-            $product->save();
+            if ($product->quantity == 0) $product->save();
         }
 
         // Rediriger avec un message de succès
-        return redirect()->route('orders.index')->with('success', 'Commande ajoutée avec succès.');
+        return redirect()->route('orders.index')->with('success', 'Commande mise à jour avec succès.');
     }
+
 
 
 
@@ -117,7 +121,10 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        dd($order->Order_details);
+        return view('products.show', [
+            'order' => $order->Order_details(),
+        ]);
     }
 
     /**
@@ -125,22 +132,48 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        //
+        return view('orders.edit', [
+            'order' => $order
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateOrderRequest $request, Order $order)
-    {
-        //
-    }
+
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Order $order)
+    public function destroy($id)
     {
-        //
+        // Récupérer la commande
+        $order = Order::findOrFail($id);
+
+        // Restaurer le stock pour chaque produit dans la commande
+        foreach ($order->Order_details as $orderDetail) {
+            if ($orderDetail->Products){
+                $product = $orderDetail->Products;
+                $product->quantity += $orderDetail->order_quantity;
+                $product->save();
+            }
+
+        }
+
+        // Supprimer la commande
+        $order->delete();
+
+        // Rediriger avec un message de succès
+        return redirect()->route('orders.index')->with('success', 'Commande supprimée avec succès et le stock a été restauré.');
+    }
+
+    public function customerOrderHistory($customerId)
+    {
+        // Récupérer le client
+        $customer = Customer::findOrFail($customerId);
+
+        // Récupérer l'historique des commandes pour ce client
+        $orderHistory = $customer->Orders()->with('Order_details')->get();
+
+        // Retourner la vue avec l'historique des commandes
+        return view('order.history', compact('orderHistory'));
     }
 }

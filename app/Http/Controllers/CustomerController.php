@@ -74,7 +74,7 @@ class CustomerController extends Controller
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
         $customer->update($request->all());
-        return redirect()->back()
+        return redirect()->route('customers.index')
             ->with('update','Customer is updated successfully.');
     }
 
@@ -87,15 +87,5 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')
             ->with('delete','Customer is deleted successfully.');
     }
-    public function customerOrderHistory($customerId)
-    {
-        // Récupérer le client
-        $customer = Customer::findOrFail($customerId);
 
-        // Récupérer l'historique des commandes pour ce client
-        $orderHistory = $customer->orders()->with('orderDetails')->get();
-
-        // Retourner la vue avec l'historique des commandes
-        return view('order.history', compact('orderHistory'));
-    }
 }

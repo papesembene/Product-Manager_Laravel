@@ -24,8 +24,8 @@
                                     <td>{{ $order->order_date }}</td>
                                     <td>
                                         <ul>
-                                            @foreach ($order->orderDetails as $detail)
-                                                <li>{{ $detail->product->name }} (Quantity: {{ $detail->order_quantity }})</li>
+                                            @foreach ($order->Order_details as $detail)
+                                               Name : <li>{{ $detail->product->name }} (Quantity: {{ $detail->order_quantity }})</li>
                                             @endforeach
                                         </ul>
                                     </td>
