@@ -76,6 +76,9 @@
                                 </li>
                             @endif
                         @else
+                            @canany(['view-dashboard'])
+                                <li><a class="nav-link" href="{{ route('dashboard.index') }}">Dashboard</a></li>
+                            @endcanany
                             @canany(['create-role', 'edit-role', 'delete-role'])
                                 <li><a class="nav-link" href="{{ route('roles.index') }}">Manage Roles</a></li>
                             @endcanany
