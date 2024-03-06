@@ -244,42 +244,7 @@
             // Définissez la valeur du champ sur la date d'aujourd'hui
             dateInput.value = formattedDate;
         });
-       /* function addProductPreview() {
-            // Récupérer les valeurs des champs
-            let productName = document.getElementById('productSelect').value;
-            let price = document.getElementById('price').value;
-            let orderQuantity = document.getElementById('order_quantity').value;
 
-            // Vérifier si les champs sont vides
-            if (!productName ||  !price || !orderQuantity) {
-                alert("Veuillez remplir tous les champs pour ajouter un produit.");
-                return; // Arrêter la fonction si un champ est vide
-            }
-
-            // Créer une nouvelle ligne pour le produit dans le tableau d'aperçu
-            let newRow = document.createElement('tr');
-
-            // Remplir la nouvelle ligne avec les valeurs des champs
-            newRow.innerHTML = `
-        <td>${productName}</td>
-        <td>${orderQuantity}</td>
-        <td>${price}</td>
-        <td>${orderQuantity * price}</td>
-        <td>
-            <button class="btn btn-outline-danger" onclick="removeProductPreview(this)">Supprimer</button>
-            <button class="btn btn-outline-success" onclick="editProductPreview(this)">Modifier</button>
-        </td>
-    `;
-
-            // Ajouter la nouvelle ligne au tableau d'aperçu
-            document.getElementById('preview_body').appendChild(newRow);
-            console.log(orderQuantity);
-            // Vider les champs du formulaire
-            document.getElementById('productSelect').value = '';
-            document.getElementById('quantity').value = '';
-            document.getElementById('price').value = '';
-            document.getElementById('order_quantity').value = '';
-        }*/
         function addProductPreview() {
             // Récupérer les valeurs des champs pour chaque ligne de produit
             let productName = document.querySelectorAll('.productSelect');
