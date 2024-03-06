@@ -14,7 +14,7 @@
                             <tr>
                                 <th>Order Number</th>
                                 <th>Order Date</th>
-                                <th>Products</th>
+                                <th>Status</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -22,13 +22,8 @@
                                 <tr>
                                     <td>{{ $order->order_num }}</td>
                                     <td>{{ $order->order_date }}</td>
-                                    <td>
-                                        <ul>
-                                            @foreach ($order->Order_details as $detail)
-                                               Name : <li>{{ $detail->product->name }} (Quantity: {{ $detail->order_quantity }})</li>
-                                            @endforeach
-                                        </ul>
-                                    </td>
+                                    <td>{{ $order->status }}</td>
+
                                 </tr>
                             @empty
                                 <tr>

@@ -43,6 +43,6 @@ Route::resources([
 // routes/web.php
 
 
-Route::get('/orders/{customerId}', [OrderController::class, 'customerOrderHistory'])->name('order.history');
+Route::get('customers/orders/{customer_id}', [\App\Http\Controllers\CustomerController::class, 'customerOrderHistory'])->name('orders.history');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

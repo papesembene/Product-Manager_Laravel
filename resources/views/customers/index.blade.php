@@ -38,7 +38,7 @@
                             <form action="{{ route('customers.destroy', $customer->id) }}" method="post">
                                 @csrf
                                 @method('DELETE')
-                                <a href="{{ route('order.history', ['customerId' => $customer->id]) }}">Historique des commandes</a>
+                                <a href="{{ route('orders.history', ['customer_id' => $customer->id]) }}">Historique des commandes</a>
                                 <a href="{{ route('customers.show', $customer->id) }}" class="btn btn-warning btn-sm"><i class="bi bi-eye"></i> Show</a>
 
                                 @can('edit-customer')

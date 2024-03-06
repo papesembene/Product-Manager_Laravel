@@ -14,10 +14,10 @@ class OrderDetail extends Model
         'order_id',
         'product_id',
     ];
-   /* public function Products()
+    public function Products()
     {
         return $this->belongsTo(Product::class);
-    }*/
+    }
     public function Order()
     {
         return $this->belongsTo(Order::class);

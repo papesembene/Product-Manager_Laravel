@@ -87,5 +87,16 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')
             ->with('delete','Customer is deleted successfully.');
     }
+    public function customerOrderHistory($customerId)
+    {
+        // Récupérer le client
+        $customer = Customer::findOrFail($customerId);
+
+        // Récupérer l'historique des commandes pour ce client
+        $orderHistory = $customer->Orders()->with('Order_details')->get();
+
+        // Retourner la vue avec l'historique des commandes
+        return view('orders.history', compact('orderHistory'));
+    }
 
 }

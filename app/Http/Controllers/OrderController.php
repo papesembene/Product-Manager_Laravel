@@ -152,11 +152,14 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        dd($order->Order_details);
+        // Chargement de la relation 'products' avec l'instance de modèle $order
+        $order->with('product');
+
         return view('orders.show', [
-            'order' => $order->Order_details(),
+            'order' => $order
         ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -197,15 +200,5 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Commande supprimée avec succès et le stock a été restauré.');
     }
 
-    public function customerOrderHistory($customerId)
-    {
-        // Récupérer le client
-        $customer = Customer::findOrFail($customerId);
 
-        // Récupérer l'historique des commandes pour ce client
-        $orderHistory = $customer->Orders()->with('Order_details')->get();
-
-        // Retourner la vue avec l'historique des commandes
-        return view('order.history', compact('orderHistory'));
-    }
 }
