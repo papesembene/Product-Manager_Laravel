@@ -103,7 +103,7 @@
                                     <tbody id="product_detail">
                                     <tr id="product">
                                         <td>
-                                            <select id="productSelect" class="form-select  @error('product-id') is-invalid @enderror " name="products[]"  >
+                                            <select id="" class="form-select productSelect  @error('product-id') is-invalid @enderror" name="product[0][product_id]">
                                                 <option>Select Product</option>
                                                 @foreach(\App\Models\Product::all() as $prod)
                                                     <option value="{{$prod->id}}">{{$prod->name}}</option>
@@ -116,21 +116,21 @@
                                         <td>
                                             <!-- Form group start -->
                                             <div class="m-0">
-                                                <input type="number" id="quantity" disabled class="form-control">
+                                                <input type="number" id="" disabled class="form-control quantity">
                                             </div>
                                             <!-- Form group end -->
                                         </td>
                                         <td>
                                             <!-- Form group start -->
                                             <div class="m-0">
-                                                <input type="number" id="price" disabled class="form-control">
+                                                <input type="number" id="" disabled class="form-control price">
                                             </div>
                                             <!-- Form group end -->
                                         </td>
                                         <td>
                                             <!-- Form group start -->
                                             <div class="input-group m-0">
-                                                <input type="number" id="order_quantity" name="quantities[]"  class="form-control" placeholder="Order Quantity">
+                                                <input type="number" id="" name="product[0][order_quantity]"  class="form-control order_quantity"  placeholder="Order Quantity">
                                                 @if ($errors->has('order_quantity'))
                                                     <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
                                                 @endif
@@ -213,19 +213,25 @@
                 });
         });
 
-        document.getElementById('productSelect').addEventListener('change', function() {
-            var productId = this.value;
-            axios.get(`/orders/product/${productId}`)
-                .then(function(response) {
-                    var productDetails = response.data;
-                    // Mettre à jour les champs de prix et de quantité avec les détails du produit
-                    document.getElementById('price').value = productDetails.price;
-                    document.getElementById('quantity').value = productDetails.quantity;
-                })
-                .catch(function(error) {
-                    console.error('Une erreur s\'est produite lors de la récupération des détails du produit :', error);
-                });
+        // Ajoutez une classe à tous les éléments 'productSelect'
+        document.querySelectorAll('.productSelect').forEach(select => {
+            select.addEventListener('change', function() {
+                var productId = this.value;
+                var row = this.closest('tr'); // Obtenez la ligne parente du champ de sélection actuel
+
+                axios.get(`/orders/product/${productId}`)
+                    .then(function(response) {
+                        var productDetails = response.data;
+                        // Mettre à jour les champs de prix et de quantité de la ligne parente avec les détails du produit
+                        row.querySelector('.price').value = productDetails.price;
+                        row.querySelector('.quantity').value = productDetails.quantity;
+                    })
+                    .catch(function(error) {
+                        console.error('Une erreur s\'est produite lors de la récupération des détails du produit :', error);
+                    });
+            });
         });
+
 
         document.addEventListener('DOMContentLoaded', function() {
             var dateInput = document.getElementById('date');
@@ -238,7 +244,7 @@
             // Définissez la valeur du champ sur la date d'aujourd'hui
             dateInput.value = formattedDate;
         });
-        function addProductPreview() {
+       /* function addProductPreview() {
             // Récupérer les valeurs des champs
             let productName = document.getElementById('productSelect').value;
             let price = document.getElementById('price').value;
@@ -273,7 +279,47 @@
             document.getElementById('quantity').value = '';
             document.getElementById('price').value = '';
             document.getElementById('order_quantity').value = '';
+        }*/
+        function addProductPreview() {
+            // Récupérer les valeurs des champs pour chaque ligne de produit
+            let productName = document.querySelectorAll('.productSelect');
+            let price = document.querySelectorAll('.price');
+            let orderQuantity = document.querySelectorAll('.order_quantity');
+
+            // Itérer sur chaque ligne de produit
+            productName.forEach(function(element, index) {
+                // Vérifier si les champs sont vides
+                if (!element.value || !price[index].value || !orderQuantity[index].value) {
+                    alert("Veuillez remplir tous les champs pour ajouter un produit.");
+                    return; // Arrêter la fonction si un champ est vide
+                }
+
+                // Créer une nouvelle ligne pour le produit dans le tableau d'aperçu
+                let newRow = document.createElement('tr');
+
+                // Remplir la nouvelle ligne avec les valeurs des champs
+                newRow.innerHTML = `
+            <td><input readonly type="number" value="${element.value}" name="product[0][product_id]"></td>
+            <td><input readonly type="number" name="product[0][order_quantity]" value="${orderQuantity[index].value}"></td>
+            <td>${price[index].value}</td>
+            <td><input readonly type="number" name="" value="${orderQuantity[index].value * price[index].value}"></td>
+            <td>
+                <button class="btn btn-outline-danger" onclick="removeProductPreview(this)">Supprimer</button>
+                <button class="btn btn-outline-success" onclick="editProductPreview(this)">Modifier</button>
+            </td>
+        `;
+
+                // Ajouter la nouvelle ligne au tableau d'aperçu
+                document.getElementById('preview_body').appendChild(newRow);
+            });
+
+            // Vider les champs du formulaire après l'ajout de tous les produits
+            document.querySelectorAll('.productSelect').forEach(input => input.value = '');
+            document.querySelectorAll('.price').forEach(input => input.value = '');
+            document.querySelectorAll('.order_quantity').forEach(input => input.value = '');
+            document.querySelectorAll('.quantity').forEach(input => input.value = '');
         }
+
 
         // Fonction pour supprimer un produit du tableau d'aperçu
         function removeProductPreview(button) {

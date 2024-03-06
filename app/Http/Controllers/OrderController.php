@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderDetailRequest;
+use App\Http\Requests\StoreProductRequest;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Http\Requests\StoreOrderRequest;
@@ -27,16 +28,18 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+   /* public function store(Request $request)
     {
-        $request->validate([
+        dd($request);
+       $request->validate([
             'order_date' => 'required|date',
             'order_num' => 'required|string',
             'customer_id' => 'required',
             'status' => 'required',
-            'products' => 'required|array',
-            'quantities' => 'required|array',
+           'products.*.product_id' => 'required|exists:products,id',
+           'products.*.order_quantity' => 'required|integer|min:1',
         ]);
+
         // Créer la commande
         $order = new Order();
         $order->customer_id = $request->input('customer_id');
@@ -44,10 +47,10 @@ class OrderController extends Controller
         $order->order_date = $request->input('order_date');
         $order->status = $request->input('status');
         $order->save();
-        dd($order);
+        $order->products()->attach($request->input('product_id'),['order_quantity'=>$request->input('order_quantity')]);
 
         // Récupérer les données des produits et quantités
-        $productsData = $request->input('products');
+       /* $productsData = $request->input('products');
         $quantitiesData = $request->input('quantities');
 
         // Enregistrer les détails de la commande pour chaque produit
@@ -64,6 +67,31 @@ class OrderController extends Controller
         }
 
         // Rediriger avec un message de succès
+        return redirect()->route('orders.index')->with('success', 'Commande ajoutée avec succès.');
+    }*/
+    public function store(Request $request)
+    {
+
+        $request->validate([
+            'order_date' => 'required|date',
+            'customer_id' => 'required',
+            'status' => 'required',
+            'product.*.product_id' => 'required|exists:products,id',
+            'product.*.order_quantity' => 'required|integer|min:1',
+        ]);
+
+        $order = new Order();
+        $order->customer_id = $request->input('customer_id');
+        $order->order_num = "COM" . rand(100, 1000);
+        $order->order_date = $request->input('order_date');
+        $order->status = $request->input('status');
+        $order->save();
+
+        $products = $request->input('product');
+        foreach ($products as $product) {
+            $order->products()->attach($product['product_id'], ['order_quantity' => $product['order_quantity']]);
+        }
+
         return redirect()->route('orders.index')->with('success', 'Commande ajoutée avec succès.');
     }
 
