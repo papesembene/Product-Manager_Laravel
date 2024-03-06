@@ -7,7 +7,7 @@
     </div>
     <div class="row">
         <div class="col-xl-12">
-            <form action="{{route('orders.store')}}" method="post" enctype="multipart/form-data">
+            <form action="{{route('orders.store')}}" method="post">
                 @csrf
                 <div class="card mb-2">
                     <div class="card-body">
@@ -57,14 +57,14 @@
                                             <!-- Form group start -->
                                             <div class="mb-3">
                                                 <label for="num" class="form-label">Order Date </label>
-                                                <input type="date" id="date" readonly class="form-control" name="order_date">
+                                                <input type="date" id="date" readonly class="form-control" name="order_date" >
                                             </div>
                                         </div>
                                         <div class="col-sm-6 col-12">
                                             <!-- Form group start -->
                                             <div class="mb-3">
                                                 <label for="status" class="form-label">Status </label>
-                                                <select  class="form-select  @error('status') is-invalid @enderror ">
+                                                <select  class="form-select  @error('status') is-invalid @enderror" name="status" >
                                                     <option value="Finished">Finished</option>
                                                     <option value="Waiting">Waiting</option>
                                                 </select>
@@ -81,7 +81,6 @@
                         </div>
                         <!-- Row end -->
                     </div>
-
                     <!-- Row start -->
                     <div class="row">
                         <div class="col-12">
@@ -104,13 +103,13 @@
                                     <tbody id="product_detail">
                                     <tr id="product">
                                         <td>
-                                            <select id="productSelect" class="form-select  @error('product_id') is-invalid @enderror " name="products[]">
+                                            <select id="productSelect" class="form-select  @error('product-id') is-invalid @enderror " name="products[]"  >
                                                 <option>Select Product</option>
                                                 @foreach(\App\Models\Product::all() as $prod)
                                                     <option value="{{$prod->id}}">{{$prod->name}}</option>
                                                 @endforeach
                                             </select>
-                                            @if ($errors->has('product_id'))
+                                            @if ($errors->has('products_id'))
                                                 <span class="text-danger">{{ $errors->first('product_id') }}</span>
                                             @endif
                                         </td>
@@ -131,7 +130,7 @@
                                         <td>
                                             <!-- Form group start -->
                                             <div class="input-group m-0">
-                                                <input type="number" id="order_quantity" name="quantities[]" class="form-control" placeholder="Order Quantity">
+                                                <input type="number" id="order_quantity" name="quantities[]"  class="form-control" placeholder="Order Quantity">
                                                 @if ($errors->has('order_quantity'))
                                                     <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
                                                 @endif
@@ -164,7 +163,6 @@
                                 </table>
                             </div>
                         </div>
-
                     </div>
                     <!-- Row end -->
                 </div>
@@ -175,14 +173,13 @@
                                 <thead>
                                 <tr>
                                     <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
                                     <th>Order Quantity</th>
+                                    <th>Price</th>
+                                    <th>Amounts</th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody id="preview_body">
-                                <!-- Le contenu du tableau sera ajouté dynamiquement avec JavaScript -->
                                 </tbody>
                             </table>
                         </div>
@@ -195,8 +192,8 @@
                 </div>
             </form>
         </div>
-        </div>
     </div>
+
     <!-- Row end -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -241,50 +238,43 @@
             // Définissez la valeur du champ sur la date d'aujourd'hui
             dateInput.value = formattedDate;
         });
-        // Fonction pour ajouter un produit au tableau d'aperçu
         function addProductPreview() {
-            // Sélectionner les valeurs des champs
+            // Récupérer les valeurs des champs
             let productName = document.getElementById('productSelect').value;
-            let quantity = document.getElementById('quantity').value;
             let price = document.getElementById('price').value;
             let orderQuantity = document.getElementById('order_quantity').value;
 
             // Vérifier si les champs sont vides
-            if (!productName || !quantity || !price || !orderQuantity) {
+            if (!productName ||  !price || !orderQuantity) {
                 alert("Veuillez remplir tous les champs pour ajouter un produit.");
                 return; // Arrêter la fonction si un champ est vide
             }
 
-            // Vérifier si le produit existe déjà dans le tableau d'aperçu
-            let products = document.querySelectorAll('#preview_body td:first-child');
-            for (let i = 0; i < products.length; i++) {
-                if (products[i].innerText === productName) {
-                    alert("Ce produit a déjà été ajouté à la commande.");
-                    return; // Arrêter la fonction si le produit existe déjà
-                }
-            }
             // Créer une nouvelle ligne pour le produit dans le tableau d'aperçu
             let newRow = document.createElement('tr');
 
             // Remplir la nouvelle ligne avec les valeurs des champs
             newRow.innerHTML = `
         <td>${productName}</td>
-        <td>${quantity}</td>
-        <td>${price}</td>
         <td>${orderQuantity}</td>
+        <td>${price}</td>
+        <td>${orderQuantity * price}</td>
         <td>
             <button class="btn btn-outline-danger" onclick="removeProductPreview(this)">Supprimer</button>
             <button class="btn btn-outline-success" onclick="editProductPreview(this)">Modifier</button>
         </td>
     `;
+
             // Ajouter la nouvelle ligne au tableau d'aperçu
             document.getElementById('preview_body').appendChild(newRow);
+            console.log(orderQuantity);
             // Vider les champs du formulaire
             document.getElementById('productSelect').value = '';
             document.getElementById('quantity').value = '';
             document.getElementById('price').value = '';
             document.getElementById('order_quantity').value = '';
         }
+
         // Fonction pour supprimer un produit du tableau d'aperçu
         function removeProductPreview(button) {
             // Sélectionner la ligne parente (tr) du bouton

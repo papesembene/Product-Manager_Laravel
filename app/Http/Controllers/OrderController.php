@@ -29,41 +29,46 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation des données
-        $validatedData = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
+        $request->validate([
             'order_date' => 'required|date',
-            'products' => 'required|array|exists:products,id',
-            'quantities' => 'required|array|min:1',
+            'order_num' => 'required|string',
+            'customer_id' => 'required',
+            'status' => 'required',
+            'products' => 'required|array',
+            'quantities' => 'required|array',
         ]);
-
         // Créer la commande
-        $order = Order::create([
-            'customer_id' => $validatedData['customer_id'],
-            'order_num' => "COM" . rand(100, 1000),
-            'order_date' => $validatedData['order_date'],
-        ]);
-        // Récupérer les données des produits
-        $productsData = $validatedData['products'];
+        $order = new Order();
+        $order->customer_id = $request->input('customer_id');
+        $order->order_num = "COM" . rand(100, 1000);
+        $order->order_date = $request->input('order_date');
+        $order->status = $request->input('status');
+        $order->save();
+        dd($order);
+
+        // Récupérer les données des produits et quantités
+        $productsData = $request->input('products');
+        $quantitiesData = $request->input('quantities');
 
         // Enregistrer les détails de la commande pour chaque produit
-        foreach ($productsData as $productData) {
-            // Créer les détails de la commande pour le produit
-            $order->order_details()->create([
-                'product_id' => $productData['product_id'],
-                'order_quantity' => $productData['order_quantity'],
-
-            ]);
+        foreach ($productsData as $key => $product_id) {
+            // Créer les détails de la commande pour le produit avec la quantité correspondante
+            $order->products()->attach($product_id, ['order_quantity' => $quantitiesData[$key]]);
 
             // Mettre à jour la quantité en stock du produit si nécessaire
-            $product = Product::find($productData['product_id']);
-            $product->quantity -= $productData['order_quantity'];
-            $product->save();
+            $product = Product::find($product_id);
+            if ($product) {
+                $newStock = $product->quantity - $quantitiesData[$key];
+                $product->update(['quantity' => $newStock]);
+            }
         }
 
         // Rediriger avec un message de succès
         return redirect()->route('orders.index')->with('success', 'Commande ajoutée avec succès.');
     }
+
+
+
 
     public function getCustomerDetails($id)
     {

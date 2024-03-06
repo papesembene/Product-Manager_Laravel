@@ -12,6 +12,7 @@ class Order extends Model
         'order_date',
         'order_num',
         'customer_id',
+        'status'
     ];
     public function Customers()
     {
@@ -20,5 +21,9 @@ class Order extends Model
     public function Order_details()
     {
         return $this->hasMany(OrderDetail::class,);
+    }
+    public function products()
+    {
+        return $this->belongsToMany(Product::class,'oder_details','order_id','product_id')->withPivot('order_quantity');
     }
 }

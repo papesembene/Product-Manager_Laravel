@@ -25,6 +25,9 @@ class StoreOrderRequest extends FormRequest
             'order_date'=>'required|date',
             'order_num'=>'required|string',
             'customer_id'=>'required',
+            'status'=>'required',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.order_quantity' => 'required|integer|min:1',
         ];
     }
 }
