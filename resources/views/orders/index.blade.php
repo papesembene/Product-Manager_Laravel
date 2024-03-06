@@ -22,6 +22,7 @@
                     <th scope="col">S#</th>
                     <th scope="col">Order Num</th>
                     <th scope="col">Date</th>
+                    <th scope="col">Status</th>
                     <th scope="col">Action</th>
                 </tr>
                 </thead>
@@ -31,6 +32,7 @@
                         <th scope="row">{{ $loop->iteration }}</th>
                         <td>{{ $order->order_num }}</td>
                         <td>{{ $order->order_date }}</td>
+                        <td>{{ $order->status }}</td>
 
                         <td>
                             <form action="{{ route('orders.destroy', $order->id) }}" method="post">

@@ -103,7 +103,7 @@
                                     <tbody id="product_detail">
                                     <tr id="product">
                                         <td>
-                                            <select id="" class="form-select productSelect  @error('product-id') is-invalid @enderror" name="product[0][product_id]">
+                                            <select id="" class="form-select productSelect  @error('product-id') is-invalid @enderror" name="products[0][order_quantity]">
                                                 <option>Select Product</option>
                                                 @foreach(\App\Models\Product::all() as $prod)
                                                     <option value="{{$prod->id}}">{{$prod->name}}</option>
@@ -116,7 +116,7 @@
                                         <td>
                                             <!-- Form group start -->
                                             <div class="m-0">
-                                                <input type="number" id="" disabled class="form-control quantity">
+                                                <input type="number" id="" disabled class="form-control quantity" >
                                             </div>
                                             <!-- Form group end -->
                                         </td>
@@ -130,7 +130,7 @@
                                         <td>
                                             <!-- Form group start -->
                                             <div class="input-group m-0">
-                                                <input type="number" id="" name="product[0][order_quantity]"  class="form-control order_quantity"  placeholder="Order Quantity">
+                                                <input type="number" id="" name="products[0][order_quantity]" class="form-control order_quantity"  placeholder="Order Quantity">
                                                 @if ($errors->has('order_quantity'))
                                                     <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
                                                 @endif
@@ -299,10 +299,10 @@
 
                 // Remplir la nouvelle ligne avec les valeurs des champs
                 newRow.innerHTML = `
-            <td><input readonly type="number" value="${element.value}" name="product[0][product_id]"></td>
-            <td><input readonly type="number" name="product[0][order_quantity]" value="${orderQuantity[index].value}"></td>
+            <td><input class="form-control" readonly type="number" value="${element.value}" name="products[${index}][product_id]"></td>
+            <td><input class="form-control" readonly type="number" name="products[${index}][order_quantity]" value="${orderQuantity[index].value}"></td>
             <td>${price[index].value}</td>
-            <td><input readonly type="number" name="" value="${orderQuantity[index].value * price[index].value}"></td>
+            <td><input class="form-control" readonly type="number" name="" value="${orderQuantity[index].value * price[index].value}"></td>
             <td>
                 <button class="btn btn-outline-danger" onclick="removeProductPreview(this)">Supprimer</button>
                 <button class="btn btn-outline-success" onclick="editProductPreview(this)">Modifier</button>
@@ -340,10 +340,10 @@
             let price = cells[2].innerText;
             let orderQuantity = cells[3].innerText;
             // Mettre à jour les valeurs des champs dans le formulaire d'ajout de produit
-            document.getElementById('productSelect').value = productName;
-            document.getElementById('quantity').value = quantity;
-            document.getElementById('price').value = price;
-            document.getElementById('order_quantity').value = orderQuantity;
+            document.getElementsByClassName('productSelect').value = productName;
+            document.getElementsByClassName('quantity').value = quantity;
+            document.getElementsByClassName('price').value = price;
+            document.getElementsByClassName('order_quantity').value = orderQuantity;
             // Supprimer la ligne du tableau d'aperçu
             row.remove();
         }

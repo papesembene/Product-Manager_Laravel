@@ -71,13 +71,12 @@ class OrderController extends Controller
     }*/
     public function store(Request $request)
     {
-
         $request->validate([
             'order_date' => 'required|date',
             'customer_id' => 'required',
             'status' => 'required',
-            'product.*.product_id' => 'required|exists:products,id',
-            'product.*.order_quantity' => 'required|integer|min:1',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.order_quantity' => 'required|min:1',
         ]);
 
         $order = new Order();
@@ -87,13 +86,23 @@ class OrderController extends Controller
         $order->status = $request->input('status');
         $order->save();
 
-        $products = $request->input('product');
-        foreach ($products as $product) {
-            $order->products()->attach($product['product_id'], ['order_quantity' => $product['order_quantity']]);
+        foreach ($request->input('products') as $product) {
+            $order->product()->attach($product['product_id'], ['order_quantity' => $product['order_quantity']]);
+
+            if ($order->status == "Finished") {
+                $productUpdate = Product::find($product['product_id']);
+                if ($productUpdate) {
+                    $newStock = $productUpdate->quantity - $product['order_quantity'];
+                    if ($newStock >= 0) {
+                        $productUpdate->update(['quantity' => $newStock]);
+                    }
+                }
+            }
         }
 
         return redirect()->route('orders.index')->with('success', 'Commande ajoutée avec succès.');
     }
+
 
 
 

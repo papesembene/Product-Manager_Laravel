@@ -12,17 +12,20 @@ class Order extends Model
         'order_date',
         'order_num',
         'customer_id',
-        'status'
+        'status',
+        'product_id',
+        'order_quantity'
     ];
-    public function Customers()
+    public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
+
     public function Order_details()
     {
         return $this->hasMany(OrderDetail::class,);
     }
-    public function products()
+    public function product()
     {
         return $this->belongsToMany(Product::class,'order_details','order_id','product_id')->withPivot('order_quantity');
     }
