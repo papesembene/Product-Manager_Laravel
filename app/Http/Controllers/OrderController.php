@@ -29,21 +29,13 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //validation  data
+        // Validation des données
         $validatedData = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'order_date' => 'required|date',
-            'products.*.product_id' => 'required|exists:products,id',
-            'products.*.order_quantity' => 'required|integer|min:1',
+            'products' => 'required|array|exists:products,id',
+            'quantities' => 'required|array|min:1',
         ]);
-
-        // Vérifier la disponibilité en stock pour chaque produit demandé
-        foreach ($validatedData['products'] as $productData) {
-            $product = Product::find($productData['product_id']);
-            if ($product->quantity < $productData['order_quantity'] || $product->quantity == 0 ) {
-                return redirect()->back()->withError('La quantité demandée n\'est pas disponible en stock pour le produit '.$product->name);
-            }
-        }
 
         // Créer la commande
         $order = Order::create([
@@ -51,24 +43,28 @@ class OrderController extends Controller
             'order_num' => "COM" . rand(100, 1000),
             'order_date' => $validatedData['order_date'],
         ]);
+        // Récupérer les données des produits
+        $productsData = $validatedData['products'];
 
-        // Créer les détails de la commande pour chaque produit
-        foreach ($validatedData['products'] as $productData) {
-            $order->Order_details()->create([
-                'order_quantity' => $productData['order_quantity'],
+        // Enregistrer les détails de la commande pour chaque produit
+        foreach ($productsData as $productData) {
+            // Créer les détails de la commande pour le produit
+            $order->order_details()->create([
                 'product_id' => $productData['product_id'],
+                'order_quantity' => $productData['order_quantity'],
+
             ]);
 
-            // Mettre à jour la quantité en stock du produit
+            // Mettre à jour la quantité en stock du produit si nécessaire
             $product = Product::find($productData['product_id']);
             $product->quantity -= $productData['order_quantity'];
-            if ($product->quantity == 0) $product->save();
-
+            $product->save();
         }
 
         // Rediriger avec un message de succès
         return redirect()->route('orders.index')->with('success', 'Commande ajoutée avec succès.');
     }
+
     public function getCustomerDetails($id)
     {
         //récupérer les détails du client en fonction de l'ID

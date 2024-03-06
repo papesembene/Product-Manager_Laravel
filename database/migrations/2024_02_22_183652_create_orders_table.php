@@ -14,6 +14,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_date');
             $table->string('order_num');
+            $table->string('status')->default('waiting');
             $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
             $table->timestamps();
         });

@@ -60,6 +60,17 @@
                                                 <input type="date" id="date" readonly class="form-control" name="order_date">
                                             </div>
                                         </div>
+                                        <div class="col-sm-6 col-12">
+                                            <!-- Form group start -->
+                                            <div class="mb-3">
+                                                <label for="status" class="form-label">Status </label>
+                                                <select  class="form-select  @error('status') is-invalid @enderror ">
+                                                    <option value="Finished">Finished</option>
+                                                    <option value="Waiting">Waiting</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
 
                                         <!-- Form group end -->
                                     </div>
@@ -93,9 +104,10 @@
                                     <tbody id="product_detail">
                                     <tr id="product">
                                         <td>
-                                            <select id="productSelect" class="form-select  @error('product_id') is-invalid @enderror " name="products[0][product_id]">
+                                            <select id="productSelect" class="form-select  @error('product_id') is-invalid @enderror " name="products[]">
                                                 <option>Select Product</option>
                                                 @foreach(\App\Models\Product::all() as $prod)
+                                                    <option value="{{$prod->id}}">{{$prod->name}}</option>
                                                 @endforeach
                                             </select>
                                             @if ($errors->has('product_id'))
@@ -112,13 +124,14 @@
                                         <td>
                                             <!-- Form group start -->
                                             <div class="m-0">
-                                                <input type="number" id="price" disabled class="form-control">                                            </div>
+                                                <input type="number" id="price" disabled class="form-control">
+                                            </div>
                                             <!-- Form group end -->
                                         </td>
                                         <td>
                                             <!-- Form group start -->
                                             <div class="input-group m-0">
-                                                <input type="number" id="order_quantity" name="products[0][order_quantity]"   class="form-control" placeholder="Order Quantity">
+                                                <input type="number" id="order_quantity" name="quantities[]" class="form-control" placeholder="Order Quantity">
                                                 @if ($errors->has('order_quantity'))
                                                     <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
                                                 @endif
@@ -140,8 +153,8 @@
 
                                     <tr>
                                         <td>
-                                            <button class="btn btn-outline-primary text-nowrap"  type="button"  id="add-product">
-                                                Add New Row
+                                            <button class="btn btn-outline-primary text-nowrap"  type="button"  id="add-product" onclick="addProductPreview()">
+                                                Add Product
                                             </button>
                                         </td>
 
@@ -151,23 +164,40 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="text-end">
-                                <button type="submit" class="btn btn-light">Save Order</button>
-                            </div>
-                        </div>
+
                     </div>
                     <!-- Row end -->
                 </div>
-
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="preview_table">
+                                <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Order Quantity</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody id="preview_body">
+                                <!-- Le contenu du tableau sera ajouté dynamiquement avec JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-light">Validate Order</button>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
-
         </div>
     </div>
     <!-- Row end -->
-
-
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
@@ -211,58 +241,76 @@
             // Définissez la valeur du champ sur la date d'aujourd'hui
             dateInput.value = formattedDate;
         });
+        // Fonction pour ajouter un produit au tableau d'aperçu
+        function addProductPreview() {
+            // Sélectionner les valeurs des champs
+            let productName = document.getElementById('productSelect').value;
+            let quantity = document.getElementById('quantity').value;
+            let price = document.getElementById('price').value;
+            let orderQuantity = document.getElementById('order_quantity').value;
 
-        document.getElementById('add-product').addEventListener('click', function() {
-            // Créer un nouveau champ de produit et l'ajouter au formulaire
-            var productContainer = document.getElementById('product_detail');
-            var productIndex = productContainer.querySelectorAll('#product').length;
-            var newProduct = document.createElement('tr');
-            newProduct.setAttribute('id', 'product');
-            newProduct.innerHTML = `
-             <td>
-                  <select id="productSelect" class="form-select @error('product_id') is-invalid @enderror" name="products[${productIndex}][product_id]">
-                        <option>Select Product</option>
-                            @foreach(\App\Models\Product::all() as $prod)
-            <option value="{{$prod->id}}">{{$prod->name}}</option>
-                             @endforeach
-            </select>
-            @error('product_id')
-            <span class="text-danger">{{ $message }}</span>
-            @enderror
-            </td>
-                 <td>
-                        <!-- Form group start -->
-                         <div class="m-0">
-                           <input type="number" id="quantity" disabled class="form-control">
-                           </div>
-                  </td>
-                  <td>
-
-                           <div class="m-0">
-                             <input type="number" id="price" disabled class="form-control">
-                             </div>
-                  </td>
-                   <td>
-
-                      <div class="input-group m-0">
-                         <input type="number" id="order_quantity" name="products[${productIndex}][order_quantity]" min=1 max={{$prod->quantity}}  class="form-control" placeholder="Order Quantity">
-                               @if ($errors->has('order_quantity'))
-                        <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
-                              @endif
-                      </div>
-                    </td>
-<button type="button" class="remove-product">Supprimer</button>
-`;
-
-            productContainer.appendChild(newProduct);
-        });
-
-        // Gérer la suppression d'un champ de produit
-        document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('remove-product')) {
-                event.target.closest('#product').remove();
+            // Vérifier si les champs sont vides
+            if (!productName || !quantity || !price || !orderQuantity) {
+                alert("Veuillez remplir tous les champs pour ajouter un produit.");
+                return; // Arrêter la fonction si un champ est vide
             }
-        });
+
+            // Vérifier si le produit existe déjà dans le tableau d'aperçu
+            let products = document.querySelectorAll('#preview_body td:first-child');
+            for (let i = 0; i < products.length; i++) {
+                if (products[i].innerText === productName) {
+                    alert("Ce produit a déjà été ajouté à la commande.");
+                    return; // Arrêter la fonction si le produit existe déjà
+                }
+            }
+            // Créer une nouvelle ligne pour le produit dans le tableau d'aperçu
+            let newRow = document.createElement('tr');
+
+            // Remplir la nouvelle ligne avec les valeurs des champs
+            newRow.innerHTML = `
+        <td>${productName}</td>
+        <td>${quantity}</td>
+        <td>${price}</td>
+        <td>${orderQuantity}</td>
+        <td>
+            <button class="btn btn-outline-danger" onclick="removeProductPreview(this)">Supprimer</button>
+            <button class="btn btn-outline-success" onclick="editProductPreview(this)">Modifier</button>
+        </td>
+    `;
+            // Ajouter la nouvelle ligne au tableau d'aperçu
+            document.getElementById('preview_body').appendChild(newRow);
+            // Vider les champs du formulaire
+            document.getElementById('productSelect').value = '';
+            document.getElementById('quantity').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('order_quantity').value = '';
+        }
+        // Fonction pour supprimer un produit du tableau d'aperçu
+        function removeProductPreview(button) {
+            // Sélectionner la ligne parente (tr) du bouton
+            let row = button.closest('tr');
+            // Supprimer la ligne du tableau d'aperçu
+            row.remove();
+        }
+        // Fonction pour modifier un produit dans le tableau d'aperçu
+        function editProductPreview(button) {
+            // Sélectionner la ligne parente (tr) du bouton
+            let row = button.closest('tr');
+            // Récupérer les cellules de la ligne
+            let cells = row.querySelectorAll('td');
+            // Extraire les données du produit de chaque cellule
+            let productName = cells[0].innerText;
+            let quantity = cells[1].innerText;
+            let price = cells[2].innerText;
+            let orderQuantity = cells[3].innerText;
+            // Mettre à jour les valeurs des champs dans le formulaire d'ajout de produit
+            document.getElementById('productSelect').value = productName;
+            document.getElementById('quantity').value = quantity;
+            document.getElementById('price').value = price;
+            document.getElementById('order_quantity').value = orderQuantity;
+            // Supprimer la ligne du tableau d'aperçu
+            row.remove();
+        }
     </script>
 
 @endsection
