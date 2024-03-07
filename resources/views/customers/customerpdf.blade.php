@@ -80,11 +80,11 @@ $numb = \App\Models\Customer::all()->count();
 </style>
 <body>
 <div class="head-title">
-    <h1 class="text-center m-0 p-0">Liste des Candidats </h1>
+    <h1 class="text-center m-0 p-0">Customers List </h1>
 </div>
 <div class="add-detail mt-10">
     <div class="w-50 float-left mt-10">
-        <p class="m-0 pt-5 text-bold w-100">Customers <span class="gray-color">{{$numb}}</span></p>
+        <p class="m-0 pt-5 text-bold w-100"> All Customers: <span class="gray-color">{{$numb}}</span></p>
     </div>
     <div style="clear: both;"></div>
 </div>
