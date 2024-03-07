@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Product;
+use PDF;
 
 class CustomerController extends Controller
 {
@@ -97,6 +98,13 @@ class CustomerController extends Controller
 
         // Retourner la vue avec l'historique des commandes
         return view('orders.history', compact('orderHistory'));
+    }
+    public function downloadCustomer()
+    {
+        $customer = Customer::all();
+        // Charger la vue avec l'instance de modèle Customer
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('customers.customerpdf', compact('customer'));
+        return $pdf->download('CustomerList.pdf');
     }
 
 }

@@ -12,7 +12,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use function Laravel\Prompts\alert;
-
+use PDF;
 
 class OrderController extends Controller
 {
@@ -199,6 +199,21 @@ class OrderController extends Controller
         // Rediriger avec un message de succès
         return redirect()->route('orders.index')->with('success', 'Commande supprimée avec succès et le stock a été restauré.');
     }
+
+
+
+    public function downloadPdf($order_id)
+    {
+        // Récupérer l'instance de modèle Order
+        $order = \App\Models\Order::with('product')->findOrFail($order_id);
+
+        // Charger la vue avec l'instance de modèle Order
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('orders.orderpdf', compact('order'));
+
+        return $pdf->download('CustomerOrder.pdf');
+    }
+
+
 
 
 }

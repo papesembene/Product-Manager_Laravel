@@ -1,8 +1,50 @@
 @extends('layouts.app')
 
 @section('content')
+    <style>
+        /* Style pour griser la page */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Opacité de l'arrière-plan gris */
+            z-index: 9999; /* Placez au-dessus de tous les autres éléments */
+        }
+
+        /* Style pour le message de chargement */
+        .loading-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 10000; /* Placez au-dessus de l'arrière-plan gris */
+        }
+
+        /* Style pour le message de confirmation */
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 10000; /* Placez au-dessus de l'arrière-plan gris */
+        }
+    </style>
+
     <!-- Row start -->
     <div class="row">
+        <div class="float-end">
+            <a href="{{ route('orders.index') }}" class="btn btn-primary btn-sm">&larr; Back</a>
+        </div>
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body">
@@ -84,11 +126,21 @@
                     </div>
                     <!-- Row end -->
 
+                    <!-- Loader -->
+                    <div id="loader" class="loading-overlay d-none">
+                        <div class="loading-message">Téléchargement en cours...</div>
+                    </div>
+
+                    <!-- Message de confirmation -->
+                    <div id="successMessage" class="success-message d-none">
+                        Téléchargement réussi!
+                    </div>
+
                     <!-- Row start -->
                     <div class="row">
                         <div class="col-sm-12 col-12">
                             <div class="text-end">
-                                <button class="btn btn-light">Download</button>
+                                <a href="{{ route('orderpdf.download', ['order_id' => $order->id]) }}" class="btn btn-primary" id="pdf-download-link">Download</a>
                                 <button class="btn btn-light ms-1">Print</button>
                             </div>
                         </div>
@@ -99,4 +151,23 @@
         </div>
     </div>
     <!-- Row end -->
+
+    <script>
+        // Fonction pour masquer le message de chargement et afficher le message de confirmation
+        function hideLoadingMessage() {
+            document.getElementById('loader').classList.add('d-none');
+            document.getElementById('successMessage').classList.remove('d-none');
+            setTimeout(function() {
+                document.getElementById('successMessage').classList.add('d-none');
+            }, 3000); // Masquer le message après 2 secondes
+        }
+
+        // Événement déclenché lorsque le téléchargement est terminé
+        document.getElementById('pdf-download-link').addEventListener('click', function() {
+            document.getElementById('loader').classList.remove('d-none');
+            document.getElementById('successMessage').classList.add('d-none');
+            // Fonction pour masquer le message de chargement lorsque le téléchargement est terminé
+            setTimeout(hideLoadingMessage, 5000); // Simulez un téléchargement de 3 secondes (à remplacer par la durée réelle du téléchargement)
+        });
+    </script>
 @endsection
