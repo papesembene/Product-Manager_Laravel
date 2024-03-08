@@ -160,7 +160,43 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('update', 'Commande update avec succès.');
 
     }*/
-    public function update(Request $request, $id)
+    public function update(Request $request, Order $order)
+    {
+//        dd($request->validated());
+        $order->update(
+            [
+                'customer_id' => $request->input('customer_id'),
+                'status' => $request->input('status'),
+                'order_num' => $request->input('order_num'),
+                'order_date' => $request->input('order_date'),
+
+            ]
+        );
+        // Détacher tous les produits de la commande
+        $order->products()->detach();
+
+
+        $Status = $request->input('status');
+        $OrderValidate = $Status === 'Finished';
+        // synchroniser les produits et les quantités
+        foreach ($request->input('products') as $key => $product) {
+            // Attacher uniquement les produits qui sont encore dans la demande
+            $order->products()->attach($product['product_id'], ['quantity' => $request->input('quantities')[$key]]);
+
+            // mise à jour du stock
+            if ($OrderValidate){
+                $productUpdate = \App\Models\Product::find($product);
+                if ($productUpdate) {
+                    // mise à jour du stock
+                    $newStock = $productUpdate->stock - $request->input('quantities')[$key];
+                    $productUpdate->update(['stock' => $newStock]);
+                }
+            }
+        }
+
+        return redirect()->route('admin.orders.index')->with('success', "La commande $order->numOrder a été modifiée avec succès");
+    }
+   /* public function update(Request $request, Order $order)
     {
         $request->validate([
             'order_date' => 'required|date',
@@ -190,7 +226,7 @@ class OrderController extends Controller
         }
 
         return redirect()->route('orders.index')->with('success', 'Commande mise à jour avec succès.');
-    }
+    }*/
 
 
 
