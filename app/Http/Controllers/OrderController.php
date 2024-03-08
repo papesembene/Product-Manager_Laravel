@@ -131,8 +131,8 @@ class OrderController extends Controller
             'order_date' => 'required|date',
             'customer_id' => 'required',
             'status' => 'required',
-            'products.*.product_id' => 'required|exists:products,id',
-            'products.*.order_quantity' => 'required|min:1',
+            'products' => 'required|array',
+            'order_quantities' => 'required|array',
         ]);
 
         $order = new Order();
@@ -141,19 +141,23 @@ class OrderController extends Controller
         $order->order_date = $request->input('order_date');
         $order->status = $request->input('status');
         $order->save();
-        foreach ($request->input('products') as $product) {
-            $order->product()->syncWithoutDetaching($product['product_id'], ['order_quantity' => $product['order_quantity']]);
-            // syncWithoutDetaching pour ne pas supprimer les produits qui ne sont pas dans la requête de la base de données
-            if ($order->status == "Finished") {
-                $productUpdate = Product::find($product['product_id']);
+        $Status = $request->input('status');
+        $statutValidate = $Status === 'Finished';
+
+        // Synchroniser les produits et les quantités
+        foreach ($request->input('products') as $key => $product) {
+            $order->products()->syncWithPivotValues($product['product_id'], ['order_quantity' => $product['order_quantity']]);
+            // Mise à jour du stock si la commande est validée
+            if ($statutValidate) {
+                $productUpdate = \App\Models\Product::find($product);
                 if ($productUpdate) {
-                    $newStock = $productUpdate->quantity - $product['order_quantity'];
-                    if ($newStock >= 0) {
-                        $productUpdate->update(['quantity' => $newStock]);
-                    }
+                    // Mise à jour du stock
+                    $newStock = $productUpdate->stock - $request->input('order_quantities')[$key];
+                    $productUpdate->update(['stock' => $newStock]);
                 }
             }
         }
+
         return redirect()->route('orders.index')->with('update', 'Commande update avec succès.');
 
     }

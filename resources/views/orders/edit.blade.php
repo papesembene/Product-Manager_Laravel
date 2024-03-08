@@ -27,20 +27,20 @@
                                                         <option value="{{$customer->id}}"  {{ old('customer_id', $order->customer_id) === $customer->id ? 'selected' : '' }}>{{ $customer->firstname.' '.$customer->lastname }}</option>
                                                     @endforeach
                                                 </select>
-                                                @if ($errors->has('customer_id'))
-                                                    <span class="text-danger">{{ $errors->first('customer_id') }}</span>
-                                                @endif
+                                                @error('customer_id')
+                                                <span class="text-danger">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                             <!-- Form group end -->
                                         </div>
                                         <div class="col-sm-6 col-12">
                                             <!-- Form group start -->
                                             <div class="mb-3">
-                                                <label for="dueDate" class="form-label">Adress </label>
-                                                <input type="text" id="customerAddress" disabled class="form-control">
-                                                @if ($errors->has('adress'))
-                                                    <span class="text-danger">{{ $errors->first('adress') }}</span>
-                                                @endif
+                                                <label for="dueDate" class="form-label">Address </label>
+                                                <input type="text" id="customerAddress" readonly class="form-control" value="{{ old('address', $order->customer->address) }}">
+                                                @error('address')
+                                                <span class="text-danger">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                             <!-- Form group end -->
                                         </div>
@@ -48,17 +48,17 @@
                                             <!-- Form group start -->
                                             <div class="mb-3">
                                                 <label for="dueDate" class="form-label">Number </label>
-                                                <input type="text" id="customerPhone" disabled class="form-control">
-                                                @if ($errors->has('number'))
-                                                    <span class="text-danger">{{ $errors->first('number') }}</span>
-                                                @endif
+                                                <input type="text" id="customerPhone" readonly class="form-control" value="{{ old('number', $order->customer->number) }}">
+                                                @error('number')
+                                                <span class="text-danger">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                         </div>
                                         <div class="col-sm-6 col-12">
                                             <!-- Form group start -->
                                             <div class="mb-3">
                                                 <label for="num" class="form-label">Order Date </label>
-                                                <input type="date" id="date" readonly class="form-control" name="order_date" >
+                                                <input type="date" id="date" readonly class="form-control" name="order_date" value="{{ old('order_date', $order->order_date) }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6 col-12">
@@ -69,13 +69,14 @@
                                                     <option value="Finished"  {{ old('status', $order->status) === 'Finished' ? 'selected' : '' }}>Finished</option>
                                                     <option value="Waiting"  {{ old('status', $order->status) === 'Waiting' ? 'selected' : '' }}>Waiting</option>
                                                 </select>
-
+                                                @error('status')
+                                                <span class="text-danger">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                         </div>
 
                                         <!-- Form group end -->
                                     </div>
-
                                 </div>
                                 <!-- Row end -->
                             </div>
@@ -110,21 +111,21 @@
                                                     <option value="{{$prod->id}}">{{$prod->name}}</option>
                                                 @endforeach
                                             </select>
-                                            @if ($errors->has('product_id'))
-                                                <span class="text-danger">{{ $errors->first('product_id') }}</span>
-                                            @endif
+                                            @error('product_id')
+                                            <span class="text-danger">{{ $message }}</span>
+                                            @enderror
                                         </td>
                                         <td>
                                             <!-- Form group start -->
                                             <div class="m-0">
-                                                <input type="number" value="{{ old('quantity') }}" id="quantity" name="quantity" disabled class="form-control quantity" >
+                                                <input type="number" value="{{ old('quantity') }}" id="quantity" name="quantity" readonly class="form-control quantity" >
                                             </div>
                                             <!-- Form group end -->
                                         </td>
                                         <td>
                                             <!-- Form group start -->
                                             <div class="m-0">
-                                                <input type="number" value="{{ old('price') }}" id="price" name="price" disabled class="form-control price">
+                                                <input type="number" value="{{ old('price') }}" id="price" name="price" readonly class="form-control price">
                                             </div>
                                             <!-- Form group end -->
                                         </td>
@@ -132,9 +133,9 @@
                                             <!-- Form group start -->
                                             <div class="input-group m-0">
                                                 <input type="number" value="{{ old('order_quantity') }}" id="order_quantity" name="order_quantity" class="form-control order_quantity"  placeholder="Order Quantity">
-                                                @if ($errors->has('order_quantity'))
-                                                    <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
-                                                @endif
+                                                @error('order_quantity')
+                                                <span class="text-danger">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                             <!-- Form group end -->
                                         </td>
@@ -187,8 +188,8 @@
                                         <td><input class="form-control" readonly type="number" name="order_quantities[]" value="{{ $product->pivot->order_quantity }}"></td>
                                         <td><input class="form-control" readonly type="number" name="prices[]" value="{{ $product->price }}"></td>
                                         @php
-                                        $tot = $product->price * $product->pivot->order_quantity ;
-                                         @endphp
+                                            $tot = $product->price * $product->pivot->order_quantity ;
+                                        @endphp
                                         <td>{{$tot}}</td>
                                         <td><input class="form-control" readonly type="number" name="amounts[]" value="{{$tot}} "></td>
                                         <td>
@@ -224,14 +225,12 @@
                     // Mettre à jour les champs d'adresse et de téléphone avec les détails du client
                     document.getElementById('customerAddress').value = customerDetails.adress;
                     document.getElementById('customerPhone').value = customerDetails.number;
-                    //console.log(data);
                 })
                 .catch(function(error) {
                     console.error('Une erreur s\'est produite lors de la récupération des détails du client :', error);
                 });
         });
 
-        // Ajoutez une classe à tous les éléments 'productSelect'
         document.querySelectorAll('.productSelect').forEach(select => {
             select.addEventListener('change', function() {
                 var productId = this.value;
@@ -250,7 +249,6 @@
             });
         });
 
-
         document.addEventListener('DOMContentLoaded', function() {
             var dateInput = document.getElementById('date');
             // Créer une nouvelle date avec la date d'aujourd'hui
@@ -262,21 +260,20 @@
             // Définissez la valeur du champ sur la date d'aujourd'hui
             dateInput.value = formattedDate;
         });
-        const productSelect = document.getElementById('product1');
-        const quantityInput = document.getElementById('quantity');
-        const priceInput = document.getElementById('price');
+
         const order_quantity = document.getElementById('order_quantity');
 
         order_quantity.addEventListener('change', function() {
+            const quantityInput = document.getElementById('quantity');
+            const priceInput = document.getElementById('price');
+
             if (parseInt(this.value) > parseInt(quantityInput.value)) {
                 this.value = quantityInput.value;
-            }else if (parseInt(this.value) <= 0) {
+            } else if (parseInt(this.value) <= 0) {
                 this.value = 1;
-            } else {
-                let total = parseInt(this.value) * parseInt(priceInput.value);
             }
-
         });
+
         function validateOrder() {
             const products = document.querySelectorAll('input[name="products[]"]');
             const quantities = document.querySelectorAll('input[name="quantities[]"]');
@@ -284,47 +281,37 @@
             if (products.length === 0) {
                 alert('Veuillez ajouter au moins un produit dans la commande');
             }
-
         }
+
         function addProductPreview() {
-            // Récupérer les valeurs des champs pour chaque ligne de produit
-            let productName = document.getElementById('product1');
-            let priceInput = document.getElementById('price');
-            let stockInput = document.getElementById('quantity');
-            let orderQuantityInput = document.getElementById('order_quantity');
-            let tbody = document.getElementById('preview_body');
-            let product = productName.options[productName.selectedIndex].text;
+            const productName = document.getElementById('product1');
+            const priceInput = document.getElementById('price');
+            const stockInput = document.getElementById('quantity');
+            const orderQuantityInput = document.getElementById('order_quantity');
+            const tbody = document.getElementById('preview_body');
+            const product = productName.options[productName.selectedIndex].text;
             const quantity = orderQuantityInput.value;
             const price = priceInput.value;
-            //const total = totalInput.value;
+
             if (!product || !quantity || !price ) {
                 alert('Veuillez remplir tous les champs');
                 return;
             }
-            // Itérer sur chaque ligne de produit
-            /*productName.forEach(function(element, index) {
-                // Vérifier si les champs sont vides
-                if (!element.value || !price[index].value || !orderQuantity[index].value) {
-                    alert("Veuillez remplir tous les champs pour ajouter un produit.");
-                    return; // Arrêter la fonction si un champ est vide
-                }*/
 
-            // Créer une nouvelle ligne pour le produit dans le tableau d'aperçu
             let newRow = document.createElement('tr');
-            newRow.id ='product[]';
-            // Remplir la nouvelle ligne avec les valeurs des champs
+
             newRow.innerHTML = `
-            <td><input class="form-control" readonly type="text" value="${productName.value}" name="products[]"></td>
-            <td><input class="form-control" readonly type="text" value="${product}" name="productNames[]"></td>
-            <td><input class="form-control" readonly type="number" name="order_quantities[]" value="${quantity}"></td>
-            <td><input class="form-control" readonly type="number" name="prices[]" value="${price}"></td>
-            <td><input class="form-control" readonly type="number" name="amounts[]" value="${price * quantity}"></td>
-            <td>
-                <button class="btn btn-outline-danger" onclick="removeProductPreview(this)">Supprimer</button>
-                <button class="btn btn-outline-success" onclick="editProductPreview(this)">Modifier</button>
-            </td>
-        `;
-            // avant d'ajouter la ligne dans le tableau, on verifie si le produit n'est pas deja dans le tableau
+                <td><input class="form-control" readonly type="text" value="${productName.value}" name="products[]"></td>
+                <td><input class="form-control" readonly type="text" value="${product}" name="productNames[]"></td>
+                <td><input class="form-control" readonly type="number" name="order_quantities[]" value="${quantity}"></td>
+                <td><input class="form-control" readonly type="number" name="prices[]" value="${price}"></td>
+                <td><input class="form-control" readonly type="number" name="amounts[]" value="${price * quantity}"></td>
+                <td>
+                    <button class="btn btn-outline-danger" onclick="removeProductPreview(this)">Supprimer</button>
+                    <button class="btn btn-outline-success" onclick="editProductPreview(this)">Modifier</button>
+                </td>
+            `;
+
             const products = document.querySelectorAll('input[name="products[]"]');
             let productExist = false;
             products.forEach(product => {
@@ -336,43 +323,56 @@
                 alert('Product Already exists');
                 return;
             }
-            // Ajouter la nouvelle ligne au tableau d'aperçu
+
             tbody.insertBefore(newRow, tbody.lastElementChild);
-            //document.getElementById('preview_body').appendChild(newRow);
-            // Vider les champs du formulaire après l'ajout de tous les produits
+
             document.getElementById('product1').value ='';
             document.getElementById('price').value = '';
             document.getElementById('order_quantity').value ='';
             document.getElementById('quantity').value = '';
         }
 
-        // Fonction pour supprimer un produit du tableau d'aperçu
         function removeProductPreview(button) {
-            // Sélectionner la ligne parente (tr) du bouton
             let row = button.closest('tr');
-            // Supprimer la ligne du tableau d'aperçu
             row.remove();
         }
-        // Fonction pour modifier un produit dans le tableau d'aperçu
+        // Ajoutez un gestionnaire d'événements pour l'événement change sur les éléments de sélection de produit
+        document.getElementById('product1').addEventListener('change', function() {
+            var productId = this.value;
+
+            // Envoyez une requête AJAX au serveur pour récupérer les détails du produit sélectionné
+            axios.get(`/orders/product/${productId}`)
+                .then(function(response) {
+                    var productDetails = response.data;
+
+                    // Mettez à jour les champs de prix et de quantité en stock dans votre formulaire avec les détails du produit récupérés
+                    document.getElementById('price').value = productDetails.price;
+                    document.getElementById('quantity').value = productDetails.quantity;
+                })
+                .catch(function(error) {
+                    console.error('Une erreur s\'est produite lors de la récupération des détails du produit :', error);
+                });
+        });
+
+
         function editProductPreview(button) {
-            // Sélectionner la ligne parente (tr) du bouton
             let row = button.closest('tr');
-            // Récupérer les cellules de la ligne
             let cells = row.querySelectorAll('td');
-            // Extraire les données du produit de chaque cellule
-            let productName = cells[0].innerText;
-            let quantity = cells[1].innerText;
-            let price = cells[2].innerText;
-            let orderQuantity = cells[3].innerText;
-            //console.log(productName,quantity,price,orderQuantity)
-            // Mettre à jour les valeurs des champs dans le formulaire d'ajout de produit
+
+            // Récupérer les valeurs des champs dans chaque cellule
+            let productName = cells[0].querySelector('input').value;
+            let orderQuantity = cells[1].querySelector('input').value;
+            let price = cells[2].querySelector('input').value;
+
+            // Mettre à jour les champs du formulaire avec les valeurs récupérées
             document.getElementById('product1').value = productName;
-            document.getElementById('quantity').value = orderQuantity;
-           document.getElementById('price').value = price;
-            document.getElementById('order_quantity').value = quantity;
-            // Supprimer la ligne du tableau d'aperçu
+            document.getElementById('order_quantity').value = orderQuantity;
+            document.getElementById('price').value = price;
+
+            // Supprimer la ligne du tableau d'aperçu après récupération des valeurs
             row.remove();
         }
+
     </script>
 
 @endsection
