@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Customer;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
+use App\Models\CustomerExport;
 use App\Models\Product;
 use PDF;
 use Maatwebsite\Excel\Facades\Excel;
