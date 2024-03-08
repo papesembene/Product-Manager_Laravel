@@ -15,7 +15,16 @@
                     </div>
                 </div>
                 <div class="card-body">
-
+                        <div class="row">
+                            <label for="name" class="col-md-4 col-form-label text-md-end text-start"><strong>Image:</strong></label>
+                            <div class="col-md-6" style="line-height: 35px;">
+                                @if ($product->image)
+                                    <img src="{{asset('./storage/images/products/',$product->image)}}" style="height:50px; width:100px; " alt="product image" srcset="">
+                                @else
+                                    <span>not image</span>
+                                @endif
+                            </div>
+                        </div>
                     <div class="row">
                         <label for="name" class="col-md-4 col-form-label text-md-end text-start"><strong>Name:</strong></label>
                         <div class="col-md-6" style="line-height: 35px;">

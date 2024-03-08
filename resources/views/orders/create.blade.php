@@ -64,7 +64,7 @@
                                             <!-- Form group start -->
                                             <div class="mb-3">
                                                 <label for="status" class="form-label">Status </label>
-                                                <select  class="form-select  @error('status') is-invalid @enderror" name="status" >
+                                                <select  class="form-select  @error('status') is-invalid @enderror" name="status" id="status" >
                                                     <option value="Finished">Finished</option>
                                                     <option value="Waiting">Waiting</option>
                                                 </select>
@@ -103,34 +103,34 @@
                                     <tbody id="product_detail">
                                     <tr id="product">
                                         <td>
-                                            <select id="" class="form-select productSelect  @error('product-id') is-invalid @enderror" name="products[0][order_quantity]">
+                                            <select id="product1" class="form-select productSelect  @error('product-id') is-invalid @enderror" name="product1">
                                                 <option>Select Product</option>
                                                 @foreach(\App\Models\Product::all() as $prod)
                                                     <option value="{{$prod->id}}">{{$prod->name}}</option>
                                                 @endforeach
                                             </select>
-                                            @if ($errors->has('products_id'))
+                                            @if ($errors->has('product_id'))
                                                 <span class="text-danger">{{ $errors->first('product_id') }}</span>
                                             @endif
                                         </td>
                                         <td>
                                             <!-- Form group start -->
                                             <div class="m-0">
-                                                <input type="number" id="" disabled class="form-control quantity" >
+                                                <input type="number" id="quantity" name="quantity" disabled class="form-control quantity" >
                                             </div>
                                             <!-- Form group end -->
                                         </td>
                                         <td>
                                             <!-- Form group start -->
                                             <div class="m-0">
-                                                <input type="number" id="" disabled class="form-control price">
+                                                <input type="number" id="price" name="price" disabled class="form-control price">
                                             </div>
                                             <!-- Form group end -->
                                         </td>
                                         <td>
                                             <!-- Form group start -->
                                             <div class="input-group m-0">
-                                                <input type="number" id="" name="products[0][order_quantity]" class="form-control order_quantity"  placeholder="Order Quantity">
+                                                <input type="number" id="order_quantity" name="order_quantity" class="form-control order_quantity"  placeholder="Order Quantity">
                                                 @if ($errors->has('order_quantity'))
                                                     <span class="text-danger">{{ $errors->first('order_quantity') }}</span>
                                                 @endif
@@ -244,47 +244,89 @@
             // Définissez la valeur du champ sur la date d'aujourd'hui
             dateInput.value = formattedDate;
         });
+        const productSelect = document.getElementById('product1');
+        const quantityInput = document.getElementById('quantity');
+        const priceInput = document.getElementById('price');
+        const order_quantity = document.getElementById('order_quantity');
 
+        order_quantity.addEventListener('change', function() {
+            if (parseInt(this.value) > parseInt(quantityInput.value)) {
+                this.value = quantityInput.value;
+            }else if (parseInt(this.value) <= 0) {
+                this.value = 1;
+            } else {
+                let total = parseInt(this.value) * parseInt(priceInput.value);
+            }
+
+        });
+        function validateOrder() {
+            const products = document.querySelectorAll('input[name="products[]"]');
+            const quantities = document.querySelectorAll('input[name="quantities[]"]');
+            const prices = document.querySelectorAll('input[name="prices[]"]');
+            if (products.length === 0) {
+                alert('Veuillez ajouter au moins un produit dans la commande');
+            }
+
+        }
         function addProductPreview() {
             // Récupérer les valeurs des champs pour chaque ligne de produit
-            let productName = document.querySelectorAll('.productSelect');
-            let price = document.querySelectorAll('.price');
-            let orderQuantity = document.querySelectorAll('.order_quantity');
-
+            let productName = document.getElementById('product1');
+            let priceInput = document.getElementById('price');
+            let stockInput = document.getElementById('quantity');
+            let orderQuantityInput = document.getElementById('order_quantity');
+            let tbody = document.getElementById('preview_body');
+            let product = productName.options[productName.selectedIndex].text;
+            const quantity = orderQuantityInput.value;
+            const price = priceInput.value;
+            //const total = totalInput.value;
+            if (!product || !quantity || !price ) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
             // Itérer sur chaque ligne de produit
-            productName.forEach(function(element, index) {
+            /*productName.forEach(function(element, index) {
                 // Vérifier si les champs sont vides
                 if (!element.value || !price[index].value || !orderQuantity[index].value) {
                     alert("Veuillez remplir tous les champs pour ajouter un produit.");
                     return; // Arrêter la fonction si un champ est vide
-                }
+                }*/
 
                 // Créer une nouvelle ligne pour le produit dans le tableau d'aperçu
                 let newRow = document.createElement('tr');
-
+                newRow.id ='product[]';
                 // Remplir la nouvelle ligne avec les valeurs des champs
                 newRow.innerHTML = `
-            <td><input class="form-control" readonly type="number" value="${element.value}" name="products[${index}][product_id]"></td>
-            <td><input class="form-control" readonly type="number" name="products[${index}][order_quantity]" value="${orderQuantity[index].value}"></td>
-            <td>${price[index].value}</td>
-            <td><input class="form-control" readonly type="number" name="" value="${orderQuantity[index].value * price[index].value}"></td>
+            <td><input class="form-control" readonly type="text" value="${productName.value}" name="products[]"></td>
+            <td><input class="form-control" readonly type="text" value="${product}" name="productNames[]"></td>
+            <td><input class="form-control" readonly type="number" name="order_quantities[]" value="${quantity}"></td>
+            <td><input class="form-control" readonly type="number" name="prices[]" value="${price}"></td>
+            <td><input class="form-control" readonly type="number" name="amounts[]" value="${price * quantity}"></td>
             <td>
                 <button class="btn btn-outline-danger" onclick="removeProductPreview(this)">Supprimer</button>
                 <button class="btn btn-outline-success" onclick="editProductPreview(this)">Modifier</button>
             </td>
         `;
-
-                // Ajouter la nouvelle ligne au tableau d'aperçu
-                document.getElementById('preview_body').appendChild(newRow);
+            // avant d'ajouter la ligne dans le tableau, on verifie si le produit n'est pas deja dans le tableau
+            const products = document.querySelectorAll('input[name="products[]"]');
+            let productExist = false;
+            products.forEach(product => {
+                if (product.value === productName.value) {
+                    productExist = true;
+                }
             });
-
+            if (productExist) {
+                alert('Product Already exists');
+                return;
+            }
+                // Ajouter la nouvelle ligne au tableau d'aperçu
+                tbody.insertBefore(newRow, tbody.lastElementChild);
+                //document.getElementById('preview_body').appendChild(newRow);
             // Vider les champs du formulaire après l'ajout de tous les produits
-            document.querySelectorAll('.productSelect').forEach(input => input.value = '');
-            document.querySelectorAll('.price').forEach(input => input.value = '');
-            document.querySelectorAll('.order_quantity').forEach(input => input.value = '');
-            document.querySelectorAll('.quantity').forEach(input => input.value = '');
+            document.getElementById('product1').value ='';
+            document.getElementById('price').value = '';
+            document.getElementById('order_quantity').value ='';
+            document.getElementById('quantity').value = '';
         }
-
 
         // Fonction pour supprimer un produit du tableau d'aperçu
         function removeProductPreview(button) {
@@ -315,5 +357,3 @@
     </script>
 
 @endsection
-
-

@@ -21,11 +21,11 @@ class Order extends Model
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
-    public function Order_details()
+    public function details()
     {
         return $this->hasMany(OrderDetail::class,);
     }
-    public function product()
+    public function products()
     {
         return $this->belongsToMany(Product::class,'order_details','order_id','product_id')->withPivot('order_quantity');
     }

@@ -98,7 +98,6 @@ $numb = \App\Models\Customer::all()->count();
             <th class="w-50">Adress</th>
             <th class="w-50">Number of Call</th>
             <th class="w-50">Gender</th>
-
         </tr>
 
         @foreach ($customer as $c)

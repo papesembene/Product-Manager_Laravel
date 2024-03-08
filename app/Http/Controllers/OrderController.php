@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -29,16 +30,17 @@ class OrderController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request)
+   /* public function store(Request $request)
     {
         $request->validate([
             'order_date' => 'required|date',
             'customer_id' => 'required',
             'status' => 'required',
-            'products.*.product_id' => 'required|exists:products,id',
-            'products.*.order_quantity' => 'required|min:1',
+            'products' => 'required|array',
+            'order_quantities' => 'required|array|min:1',
         ]);
 
+        // Créer une instance de Order en dehors de la boucle
         $order = new Order();
         $order->customer_id = $request->input('customer_id');
         $order->order_num = "COM" . rand(100, 1000);
@@ -47,21 +49,76 @@ class OrderController extends Controller
         $order->save();
 
         foreach ($request->input('products') as $product) {
-            $order->product()->attach($product['product_id'], ['order_quantity' => $product['order_quantity']]);
+            $orderDetail = new OrderDetail([
+                'order_id' => $order->id,
+                'product_id' => $product['product_id'],
+                'order_quantity' => $product['order_quantity'],
+            ]);
 
-            if ($order->status == "Finished") {
+            if ($order->status === "Finished") {
                 $productUpdate = Product::find($product['product_id']);
                 if ($productUpdate) {
                     $newStock = $productUpdate->quantity - $product['order_quantity'];
                     if ($newStock >= 0) {
+                        $orderDetail->save();
                         $productUpdate->update(['quantity' => $newStock]);
+                    } else {
+                        // Rétablir l'ordre s'il n'y a pas suffisamment de stock
+                        $order->delete();
+                        return redirect()->route('orders.index')->with('error', 'Not enough stock for product ' . $productUpdate->name);
                     }
+                }
+            } else {
+                $orderDetail->save();
+            }
+        }
+
+        return redirect()->route('orders.index')->with('success', 'Order added successfully.');
+    }*/
+    public function store(Request $request)
+    {
+        //dd($request);
+        $request->validate([
+            'order_date' => 'required|date',
+            'customer_id' => 'required',
+            'status' => 'required',
+            'products' => 'required|array',
+            'order_quantities' => 'required|array|min:1',
+        ]);
+
+        $order = \App\Models\Order::create([
+            'customer_id' => $request->input('customer_id'),
+            'status' => $request->input('status'),
+            'order_num' => "COM" . rand(100, 1000),
+            'order_date' => $request->input('order_date'),
+        ]);
+
+        $orderStatus = $request->input('status');
+        $OrderValidate = $orderStatus === 'Finished';
+
+        // Synchroniser les produits et les quantités
+        foreach ($request->input('products') as $key => $product) {
+            $order->products()->attach($product, ['order_quantity' => $request->input('order_quantities')[$key]]);
+
+            // Mise à jour du stock si la commande est validée
+            if ($OrderValidate) {
+                $productUpdate = \App\Models\Product::find($product);
+                if ($productUpdate) {
+                    // Mise à jour du stock
+                    $newStock = $productUpdate->stock - $request->input('order_quantities')[$key];
+                    $productUpdate->update(['stock' => $newStock]);
                 }
             }
         }
 
-        return redirect()->route('orders.index')->with('success', 'Commande ajoutée avec succès.');
+        return redirect()->route('orders.index')->with('success', "La commande $order->order_num a été créée avec succès");
     }
+
+
+
+
+
+
 
 
 
@@ -121,6 +178,7 @@ class OrderController extends Controller
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.order_quantity' => 'required|min:1',
         ]);
+
         $order = new Order();
         $order->customer_id = $request->input('customer_id');
         $order->order_num = "COM" . rand(100, 1000);

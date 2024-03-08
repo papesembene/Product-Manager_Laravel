@@ -99,13 +99,15 @@
                                     @php
                                         $full = 0;
                                     @endphp
-                                    @foreach ($order->product as $product)
+                                    @foreach ($order->products as $product)
                                         <tr>
                                             <td>{{ $product->name }}</td>
                                             <td>{{ $product->pivot->order_quantity }}</td>
                                             <td>{{ $product->price }}</td>
                                             <td>{{ $product->pivot->order_quantity * $product->price }}</td>
                                         </tr>
+                                        {{$full += $product->pivot->order_quantity * $product->price}}
+                                    @endforeach
                                         <tr>
                                             <td colspan="2">&nbsp;</td>
                                             <td>
@@ -114,11 +116,11 @@
                                             </td>
                                             <td>
                                                 <h5 class="mt-4 text-primary">
-                                                    {{$full += $product->pivot->order_quantity * $product->price}}
+                                                    {{$full}}
                                                 </h5>
                                             </td>
                                         </tr>
-                                    @endforeach
+
                                     </tbody>
                                 </table>
                             </div>
