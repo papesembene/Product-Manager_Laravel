@@ -59,12 +59,12 @@
                                 <select class="form-select @error('roles') is-invalid @enderror" multiple aria-label="Roles" id="roles" name="roles[]">
                                     @forelse ($roles as $role)
 
-                                        @if ($role!='Super Admin')
+                                        @if ($role!=' Admin')
                                             <option value="{{ $role }}" {{ in_array($role, old('roles') ?? []) ? 'selected' : '' }}>
                                                 {{ $role }}
                                             </option>
                                         @else
-                                            @if (Auth::user()->hasRole('Super Admin'))
+                                            @if (Auth::user()->hasRole(' Admin'))
                                                 <option value="{{ $role }}" {{ in_array($role, old('roles') ?? []) ? 'selected' : '' }}>
                                                     {{ $role }}
                                                 </option>

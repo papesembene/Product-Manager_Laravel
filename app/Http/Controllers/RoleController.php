@@ -112,7 +112,7 @@ class RoleController extends Controller
     public function destroy(Role $role): RedirectResponse
     {
         if($role->name=='Admin'){
-            abort(403, 'SUPER ADMIN ROLE CAN NOT BE DELETED');
+            abort(403, ' ADMIN ROLE CAN NOT BE DELETED');
         }
         if(auth()->user()->hasRole($role->name)){
             abort(403, 'CAN NOT DELETE SELF ASSIGNED ROLE');

@@ -96,7 +96,7 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($customerId);
 
         // Récupérer l'historique des commandes pour ce client
-        $orderHistory = $customer->Orders()->with('Order_details')->get();
+        $orderHistory = $customer->Orders()->with('details')->get();
 
         // Retourner la vue avec l'historique des commandes
         return view('orders.history', compact('orderHistory'));

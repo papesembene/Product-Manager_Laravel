@@ -143,7 +143,7 @@
                         <div class="col-sm-12 col-12">
                             <div class="text-end">
                                 <a href="{{ route('orderpdf.download', ['order_id' => $order->id]) }}" class="btn btn-primary" id="pdf-download-link">Download</a>
-                                <button class="btn btn-light ms-1">Print</button>
+
                             </div>
                         </div>
                     </div>
@@ -161,7 +161,7 @@
             document.getElementById('successMessage').classList.remove('d-none');
             setTimeout(function() {
                 document.getElementById('successMessage').classList.add('d-none');
-            }, 3000); // Masquer le message après 2 secondes
+            }, 3000); // Masquer le message après 3 secondes
         }
 
         // Événement déclenché lorsque le téléchargement est terminé
@@ -169,7 +169,7 @@
             document.getElementById('loader').classList.remove('d-none');
             document.getElementById('successMessage').classList.add('d-none');
             // Fonction pour masquer le message de chargement lorsque le téléchargement est terminé
-            setTimeout(hideLoadingMessage, 5000); // Simulez un téléchargement de 3 secondes (à remplacer par la durée réelle du téléchargement)
+            setTimeout(hideLoadingMessage, 5000); // Simulez un téléchargement de 5 secondes (à remplacer par la durée réelle du téléchargement)
         });
     </script>
 @endsection
