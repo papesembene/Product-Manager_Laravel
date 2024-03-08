@@ -4,7 +4,6 @@
         <div class="col-md-9 col-10">
             <!-- App header actions start -->
             <div class="header-actions d-flex align-items-center justify-content-end">
-
                 <!-- Search container start -->
                 <div class="search-container d-none d-lg-block">
                     <input type="text" class="form-control" placeholder="Search" />
@@ -17,10 +16,8 @@
                     <i class="icon-menu"></i>
                 </button>
                 <!-- Toggle Menu ends -->
-
             </div>
             <!-- App header actions end -->
-
         </div>
         <div id="app">
             <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
@@ -35,9 +32,6 @@
                                 <i class="icon-search"></i>
                             </div>
                             <!-- Search container end -->
-
-
-
                             <!-- Toggle Menu starts -->
                             <button class="btn btn-success btn-sm ms-3 d-lg-none d-md-block" type="button"
                                     data-bs-toggle="offcanvas" data-bs-target="#MobileMenu">
@@ -117,15 +111,11 @@
                 <div class="container">
                     <div class="row justify-content-center mt-3">
                         <div class="col-md-12">
-
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success text-center" role="alert">
                                     {{ $message }}
                                 </div>
                             @endif
-
-
-
 
                         </div>
                     </div>
