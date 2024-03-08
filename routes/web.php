@@ -42,10 +42,12 @@ Route::resources([
 ]);
 // routes/web.php
 
-Route::get('/customer/download',
+Route::get('/customer/downloadPDF',
     [\App\Http\Controllers\CustomerController::class, 'downloadCustomer'])
     ->name('customer.download');
-
+Route::get('/customer/downloadExcel',
+    [\App\Http\Controllers\CustomerController::class, 'downloadExcel'])
+    ->name('customer.downloadexcel');
 Route::get('customers/orders/{customer_id}', [\App\Http\Controllers\CustomerController::class, 'customerOrderHistory'])->name('orders.history');
 Route::get('/customerorders/{order_id}/download', [OrderController::class, 'downloadPdf'])->name('orderpdf.download');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

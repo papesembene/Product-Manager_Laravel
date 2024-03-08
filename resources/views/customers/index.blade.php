@@ -17,7 +17,8 @@
             @can('create-customer')
                 <a href="{{ route('customers.create') }}" class="btn btn-success btn-sm my-2"><i class="bi bi-plus-circle"></i> Add New Customer</a>
             @endcan
-                <a href="{{ route('customer.download') }}" class="btn btn-light btn-sm my-2"> Download </a>
+                <a href="{{ route('customer.download') }}" class="btn btn-light btn-sm my-2"> PDF </a>
+                <a href="{{ route('customer.downloadexcel') }}" class="btn btn-outline-success btn-sm my-2"> EXCEL </a>
                 <table class="table table-striped table-bordered">
                 <thead>
                 <tr>

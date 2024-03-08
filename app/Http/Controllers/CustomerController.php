@@ -8,6 +8,7 @@ use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Product;
 use PDF;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CustomerController extends Controller
 {
@@ -105,6 +106,10 @@ class CustomerController extends Controller
         // Charger la vue avec l'instance de modèle Customer
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('customers.customerpdf', compact('customer'));
         return $pdf->download('CustomerList.pdf');
+    }
+    public function downloadExcel()
+    {
+        return Excel::download(new CustomerExport(), 'customersList.xlsx');
     }
 
 }

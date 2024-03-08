@@ -3,8 +3,8 @@
 @section('content')
     <div class="card">
         <div class="card-header">Orders List</div>
-        @if (session('store'))
-            <alert class="alert alert-success"> {{session('store')}} </alert>
+        @if (session('success'))
+            <alert class="alert alert-success"> {{session('success')}} </alert>
         @endif
         @if (session('update'))
             <alert class="alert alert-secondary"> {{session('update')}} </alert>
