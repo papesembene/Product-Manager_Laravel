@@ -42,7 +42,9 @@
                                 <a href="{{ route('orders.show', $order->id) }}" class="btn btn-warning btn-sm"><i class="bi bi-eye"></i> Show</a>
 
                                 @can('edit-order')
-                                    <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Edit</a>
+
+                                        <a {{$order->status =='Finished'?'hidden':''}} href="{{ route('orders.edit', $order->id) }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Edit</a>
+
                                 @endcan
 
                                 @can('delete-order')
