@@ -10,7 +10,7 @@
                 </div>
                 <div class="card-body">
                     <p class="mb-4">
-                        Nombre total de clients : {{ $totalCustomers }}
+                        number of Customers : {{ $totalCustomers }}
                     </p>
 
                 </div>
@@ -25,9 +25,9 @@
 
                 <div class="card-body">
                     <p class="mb-4">
-                        Nombre total de produits: {{ $totalProducts }}
+                        All Products : {{ $totalProducts }}
                     </p>
-                    
+
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
                 <div class="card-body">
 
                     <p class="mb-3">
-                        Masculin: {{ $maleCustomers }}, Féminin: {{ $femaleCustomers }}
+                        Male: {{ $maleCustomers }}, Female: {{ $femaleCustomers }}
                     </p>
 
                 </div>
