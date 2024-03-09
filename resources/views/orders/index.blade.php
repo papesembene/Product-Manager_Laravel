@@ -48,7 +48,7 @@
                                 @endcan
 
                                 @can('delete-order')
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Do you want to delete this order?');"><i class="bi bi-trash"></i> Delete</button>
+                                    <button {{$order->status =='Finished'?'hidden':''}} type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Do you want to delete this order?');"><i class="bi bi-trash"></i> Delete</button>
                                 @endcan
                             </form>
                         </td>
