@@ -163,11 +163,18 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
 //        dd($request->validated());
+        $request->validate([
+            'order_date' => 'required|date',
+            'customer_id' => 'required',
+            'status' => 'required',
+            'products' => 'required|array',
+            'order_quantities' => 'required|array',
+        ]);
         $order->update(
             [
                 'customer_id' => $request->input('customer_id'),
                 'status' => $request->input('status'),
-                'order_num' => $request->input('order_num'),
+                'order_num' => "COM" . rand(100, 1000),
                 'order_date' => $request->input('order_date'),
 
             ]

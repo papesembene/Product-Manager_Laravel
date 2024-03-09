@@ -186,7 +186,7 @@
                     </div>
                     <div class="col-12">
                         <div class="text-end">
-                            <button type="submit" class="btn btn-light">Validate Order</button>
+                            <button type="submit" class="btn btn-light" onclick="validateOrder()">Validate Order</button>
                         </div>
                     </div>
                 </div>

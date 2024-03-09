@@ -301,7 +301,6 @@
             let newRow = document.createElement('tr');
 
             newRow.innerHTML = `
-                <td><input class="form-control" readonly type="text" value="${productName.value}" name="products[]"></td>
                 <td><input class="form-control" readonly type="text" value="${product}" name="productNames[]"></td>
                 <td><input class="form-control" readonly type="number" name="order_quantities[]" value="${quantity}"></td>
                 <td><input class="form-control" readonly type="number" name="prices[]" value="${price}"></td>
