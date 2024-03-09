@@ -170,7 +170,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         // Chargement de la relation 'products' avec l'instance de modèle $order
-        $order->with('product');
+        $order->with('products');
 
         return view('orders.show', [
             'order' => $order
@@ -205,7 +205,7 @@ class OrderController extends Controller
     public function downloadPdf($order_id)
     {
         // Récupérer l'instance de modèle Order
-        $order = \App\Models\Order::with('product')->findOrFail($order_id);
+        $order = \App\Models\Order::with('products')->findOrFail($order_id);
 
         // Charger la vue avec l'instance de modèle Order
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('orders.orderpdf', compact('order'));

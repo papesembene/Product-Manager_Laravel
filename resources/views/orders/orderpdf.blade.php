@@ -85,20 +85,22 @@
                                 @php
                                     $full = 0;
                                 @endphp
-                                @foreach ($order->product as $product)
+                                @foreach ($order->products as $product)
                                     <tr>
                                         <td>{{ $product->name }}</td>
                                         <td>{{ $product->pivot->order_quantity }}</td>
                                         <td>{{ $product->price }}</td>
                                         <td>{{ $product->pivot->order_quantity * $product->price }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2">&nbsp;</td>
-                                        <td colspan="2">
-                                            <h5 class="mt-4 text-primary">Full Amount: {{$full += $product->pivot->order_quantity * $product->price}}</h5>
-                                        </td>
+                                        @php
+                                            $full += $product->pivot->order_quantity * $product->price
+                                         @endphp
                                     </tr>
                                 @endforeach
+                                <tr>
+                                    <td colspan="2">
+                                        <h5 class="mt-4 text-primary">Full Amount: {{$full}}</h5>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
