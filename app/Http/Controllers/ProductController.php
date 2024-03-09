@@ -52,11 +52,22 @@ class ProductController extends Controller
     {
         $product = new Product();
         $filename = time() .'.' . $request->image->extension();
-        $request->image->storeAs('public/images/products',$filename);
-        $product->image = $filename;
-        Product::create($request->all());
+        $request->image->storeAs('public/images',$filename);
+        Product::create([
+            'name'=>$request->input('name'),
+            'price'=>$request->input('price'),
+            'quantity'=>$request->input('quantity'),
+            'description'=>$request->input('description'),
+            'image'=>$filename,
+            'category_id'=>$request->input('category_id'),
+        ]);
+        //$product->image = $filename;
         return redirect()->route('products.index')
             ->with('store','New product is added successfully.');
+    }
+    public  function imageurl():string
+    {
+        return  Storage::disk('public/images/products')->url($this->image);
     }
 
     /**
@@ -94,7 +105,7 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product): RedirectResponse
+    /*public function destroy(Product $product): RedirectResponse
     {
         if ($product->image !== null){
             Storage::disk('public')->delete($product->image);
@@ -102,5 +113,25 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('products.index')
             ->with('delete','Product is deleted successfully.');
+    }*/
+    public function destroy(Product $product): RedirectResponse
+    {
+        // Vérifier si le produit est associé à une commande
+        if ($product->Orders()->exists()) {
+            return redirect()->route('products.index')
+                ->with('error', 'can not delete this commande');
+        }
+
+        // Supprimer l'image du produit s'il en a une
+        if ($product->image !== null){
+            Storage::disk('public')->delete($product->image);
+        }
+
+        // Supprimer le produit lui-même de la base de données
+        $product->delete();
+
+        return redirect()->route('products.index')
+            ->with('delete', 'Product is deleted successfully');
     }
+
 }

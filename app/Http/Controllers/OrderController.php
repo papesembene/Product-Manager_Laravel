@@ -195,7 +195,7 @@ class OrderController extends Controller
         $order->delete();
 
         // Rediriger avec un message de succès
-        return redirect()->route('orders.index')->with('success', 'Commande supprimée avec succès et le stock a été restauré.');
+        return redirect()->route('orders.index')->with('success', 'Order deleted');
     }
 
     public function downloadPdf($order_id)
