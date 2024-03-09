@@ -169,7 +169,7 @@
             document.getElementById('loader').classList.remove('d-none');
             document.getElementById('successMessage').classList.add('d-none');
             // Fonction pour masquer le message de chargement lorsque le téléchargement est terminé
-            setTimeout(hideLoadingMessage, 3000); // Simulez un téléchargement de 5 secondes (à remplacer par la durée réelle du téléchargement)
+            setTimeout(hideLoadingMessage, 10000); // Simulez un téléchargement de 5 secondes (à remplacer par la durée réelle du téléchargement)
         });
     </script>
 @endsection

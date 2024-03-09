@@ -48,25 +48,21 @@ class OrderController extends Controller
             'order_num' => "COM" . rand(100, 1000),
             'order_date' => $request->input('order_date'),
         ]);
-
         $Status = $request->input('status');
         $statutValidate = $Status === 'Finished';
-
         // Synchroniser les produits et les quantités
         foreach ($request->input('products') as $key => $product) {
             $order->products()->attach($product, ['order_quantity' => $request->input('order_quantities')[$key]]);
-
             // Mise à jour du stock si la commande est validée
             if ($statutValidate) {
                 $productUpdate = \App\Models\Product::find($product);
                 if ($productUpdate) {
                     // Mise à jour du stock
-                    $newStock = $productUpdate->stock - $request->input('order_quantities')[$key];
-                    $productUpdate->update(['stock' => $newStock]);
+                    $newStock = $productUpdate->quantity - $request->input('order_quantities')[$key];
+                    $productUpdate->update(['quantity' => $newStock]);
                 }
             }
         }
-
         return redirect()->route('orders.index')->with('success', "Order $order->order_num add with success");
     }
 
@@ -156,8 +152,8 @@ class OrderController extends Controller
                 $productUpdate = \App\Models\Product::find($product);
                 if ($productUpdate) {
                     // mise à jour du stock
-                    $newStock = $productUpdate->stock - $request->input('quantities')[$key];
-                    $productUpdate->update(['stock' => $newStock]);
+                    $newStock = $productUpdate->quantity - $request->input('quantities')[$key];
+                    $productUpdate->update(['quantity' => $newStock]);
                 }
             }
         }
