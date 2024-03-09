@@ -125,41 +125,6 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-   /* public function update(Request $request)
-    {
-        $request->validate([
-            'order_date' => 'required|date',
-            'customer_id' => 'required',
-            'status' => 'required',
-            'products' => 'required|array',
-            'order_quantities' => 'required|array',
-        ]);
-
-        $order = new Order();
-        $order->customer_id = $request->input('customer_id');
-        $order->order_num = "COM" . rand(100, 1000);
-        $order->order_date = $request->input('order_date');
-        $order->status = $request->input('status');
-        $order->save();
-        $Status = $request->input('status');
-        $statutValidate = $Status === 'Finished';
-        // Synchroniser les produits et les quantités
-        foreach ($request->input('products') as $key => $product) {
-            $order->products()->attach($product['product_id'], ['order_quantity' => $product['order_quantity']]);
-            // Mise à jour du stock si la commande est validée
-            if ($statutValidate) {
-                $productUpdate = \App\Models\Product::find($product);
-                if ($productUpdate) {
-                    // Mise à jour du stock
-                    $newStock = $productUpdate->stock - $request->input('order_quantities')[$key];
-                    $productUpdate->update(['stock' => $newStock]);
-                }
-            }
-        }
-
-        return redirect()->route('orders.index')->with('update', 'Commande update avec succès.');
-
-    }*/
     public function update(Request $request, Order $order)
     {
 //        dd($request->validated());
@@ -176,20 +141,16 @@ class OrderController extends Controller
                 'status' => $request->input('status'),
                 'order_num' => "COM" . rand(100, 1000),
                 'order_date' => $request->input('order_date'),
-
             ]
         );
         // Détacher tous les produits de la commande
         $order->products()->detach();
-
-
         $Status = $request->input('status');
         $OrderValidate = $Status === 'Finished';
         // synchroniser les produits et les quantités
         foreach ($request->input('products') as $key => $product) {
             // Attacher uniquement les produits qui sont encore dans la demande
-            $order->products()->attach($product['product_id'], ['quantity' => $request->input('quantities')[$key]]);
-
+            $order->products()->attach($product['product_id'], ['quantity' => $request->input('order_quantities')[$key]]);
             // mise à jour du stock
             if ($OrderValidate){
                 $productUpdate = \App\Models\Product::find($product);
@@ -200,44 +161,8 @@ class OrderController extends Controller
                 }
             }
         }
-
         return redirect()->route('admin.orders.index')->with('success', "La commande $order->numOrder a été modifiée avec succès");
     }
-   /* public function update(Request $request, Order $order)
-    {
-        $request->validate([
-            'order_date' => 'required|date',
-            'customer_id' => 'required',
-            'status' => 'required',
-            'products' => 'required|array',
-            'order_quantities' => 'required|array',
-        ]);
-
-        $order = Order::findOrFail($id);
-        $order->customer_id = $request->input('customer_id');
-        $order->order_date = $request->input('order_date');
-        $order->status = $request->input('status');
-        $order->save();
-
-        $statutValidate = $request->input('status') === 'Finished';
-
-        // Synchroniser les produits et les quantités
-        foreach ($request->input('products') as $key => $productId) {
-            $order->products()->updateExistingPivot($productId, ['order_quantity' => $request->input('order_quantities')[$key]]);
-            // Mise à jour du stock si la commande est validée
-            if ($statutValidate) {
-                $product = Product::findOrFail($productId);
-                $newStock = $product->stock - $request->input('order_quantities')[$key];
-                $product->update(['stock' => $newStock]);
-            }
-        }
-
-        return redirect()->route('orders.index')->with('success', 'Commande mise à jour avec succès.');
-    }*/
-
-
-
-
 
     /**
      * Display the specified resource.
@@ -252,7 +177,6 @@ class OrderController extends Controller
         ]);
     }
 
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -262,8 +186,6 @@ class OrderController extends Controller
             'order' => $order
         ]);
     }
-
-
 
 
     /**
@@ -280,8 +202,6 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Commande supprimée avec succès et le stock a été restauré.');
     }
 
-
-
     public function downloadPdf($order_id)
     {
         // Récupérer l'instance de modèle Order
@@ -292,8 +212,5 @@ class OrderController extends Controller
 
         return $pdf->download('CustomerOrder.pdf');
     }
-
-
-
 
 }
